@@ -216,7 +216,10 @@ public struct SocialLoginGroupView: View {
                         if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []),
                            let responseDict = jsonResponse as? [String: Any] {
                             print("requestLoginWithGoogle Response: \(responseDict)")
-                            onLoginResponse(response: responseDict)
+                            DispatchQueue.main.sync {
+                                onLoginResponse(response: responseDict)
+                            }
+                            
                         }
                         
                     case .failure(let error):

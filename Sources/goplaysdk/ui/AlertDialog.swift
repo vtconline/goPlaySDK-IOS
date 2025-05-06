@@ -57,17 +57,22 @@ class AlertDialog {
     }
 
     /// Get the top most view controller to present from
-    private func topViewController(base: UIViewController? = nil, completion: ((UIViewController?) -> Void)? = nil) -> UIViewController? {
+    private func topViewController(base: UIViewController? = nil, completion: ((UIViewController?) -> Void)? = nil) {
         var baseVC: UIViewController?
 
         // Ensure we access UIApplication/WindowScene on the main thread
         DispatchQueue.main.async {
-            let scene = UIApplication.shared.connectedScenes
-                .compactMap { $0 as? UIWindowScene }
-                .first
-
-            baseVC = base ?? scene?.keyWindow?.rootViewController
+            // Get the first UIWindowScene (connected scene)
+            guard let scene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first else {
+                    completion?(nil)  // If no scene is available, return nil via completion
+                    return
+            }
             
+            // Get the root view controller from the key window
+            baseVC = base ?? scene.keyWindow?.rootViewController
+
             // Recursively find the top view controller
             if let nav = baseVC as? UINavigationController {
                 self.topViewController(base: nav.visibleViewController, completion: completion)
@@ -80,9 +85,6 @@ class AlertDialog {
                 completion?(baseVC)
             }
         }
-
-        // Return the baseVC synchronously as a fallback in case no completion handler is provided
-        return baseVC
     }
 
 

@@ -16,6 +16,7 @@ class GoogleSignInManager {
                 withPresenting: topVC // "36318724422-hbqlqt43bcs4qb81i3f872l7dh2hphvv.apps.g Provide the presenting view controller here
             ) { user, error in
                 completion(user, error)
+                
             }
         }
 
