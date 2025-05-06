@@ -208,24 +208,25 @@ public struct SocialLoginGroupView: View {
                 DispatchQueue.main.async {
                     
                     LoadingDialog.instance.hide();
+                    switch result {
+                    case .success(let data):
+                        // Handle successful response
+                        
+                        // Parse the response if necessary
+                        if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []),
+                           let responseDict = jsonResponse as? [String: Any] {
+                            print("requestLoginWithGoogle Response: \(responseDict)")
+                            onLoginResponse(response: responseDict)
+                        }
+                        
+                    case .failure(let error):
+                        // Handle failure response
+                        //                    print("Error: \(error.localizedDescription)")
+                        AlertDialog.instance.show(message: error.localizedDescription)
+                    }
                 }
                 
-                switch result {
-                case .success(let data):
-                    // Handle successful response
-                    
-                    // Parse the response if necessary
-                    if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []),
-                       let responseDict = jsonResponse as? [String: Any] {
-                        print("requestLoginWithGoogle Response: \(responseDict)")
-                        onLoginResponse(response: responseDict)
-                    }
-                    
-                case .failure(let error):
-                    // Handle failure response
-                    //                    print("Error: \(error.localizedDescription)")
-                    AlertDialog.instance.show(message: error.localizedDescription)
-                }
+                
             }
         }
     }
@@ -288,7 +289,10 @@ public struct SocialLoginGroupView: View {
     }
     
     private func requestLoginWithApple(appleId: String, appleMail: String?, token: String,name: String?) {
-        LoadingDialog.instance.show();
+        DispatchQueue.main.async {
+            LoadingDialog.instance.show();
+        }
+        
         
         // This would be a sample data payload to send in the POST request
         var bodyData: [String: Any] = [
@@ -299,30 +303,31 @@ public struct SocialLoginGroupView: View {
         if(name != nil){
             bodyData["apName"] = name
         }
-        
+        LoadingDialog.instance.show();
         Task {
             await ApiService.shared.post(path: GoApi.oauthApple, body: bodyData) { result in
                 DispatchQueue.main.async {
                     
                     LoadingDialog.instance.hide();
+                    switch result {
+                    case .success(let data):
+                        // Handle successful response
+                        
+                        // Parse the response if necessary
+                        if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []),
+                           let responseDict = jsonResponse as? [String: Any] {
+                            print("requestLoginWithApple Response: \(responseDict)")
+                            onLoginResponse(response: responseDict)
+                        }
+                        
+                    case .failure(let error):
+                        // Handle failure response
+                        //                    print("Error: \(error.localizedDescription)")
+                        AlertDialog.instance.show(message: error.localizedDescription)
+                    }
                 }
                 
-                switch result {
-                case .success(let data):
-                    // Handle successful response
-                    
-                    // Parse the response if necessary
-                    if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []),
-                       let responseDict = jsonResponse as? [String: Any] {
-                        print("requestLoginWithApple Response: \(responseDict)")
-                        onLoginResponse(response: responseDict)
-                    }
-                    
-                case .failure(let error):
-                    // Handle failure response
-                    //                    print("Error: \(error.localizedDescription)")
-                    AlertDialog.instance.show(message: error.localizedDescription)
-                }
+                
             }
         }
     }
