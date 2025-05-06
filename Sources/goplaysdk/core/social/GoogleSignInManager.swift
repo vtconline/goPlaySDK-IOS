@@ -8,7 +8,12 @@ class GoogleSignInManager {
 
     func signIn(completion: @escaping (GIDSignInResult?, Error?) -> Void) {
         // Get the root view controller from the app
-        guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else {
+        var rootController: UIViewController?
+        DispatchQueue.main.sync {
+            rootViewController = UIApplication.shared.windows.first?.rootViewController
+        }
+
+        guard let rootViewController = rootController else {
             return
         }
 

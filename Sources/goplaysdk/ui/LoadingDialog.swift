@@ -21,7 +21,18 @@ class LoadingDialog {
         guard overlayView == nil else { return } // Prevent showing multiple overlays
 
         // Get the main view (or fallback to key window)
-        let parentView = view ?? UIApplication.shared.windows.first { $0.isKeyWindow }
+//        let parentView = view ?? UIApplication.shared.windows.first { $0.isKeyWindow }
+        let parentView: UIView = {
+            if let view = view {
+                return view
+            } else {
+                var keyWindow: UIWindow?
+                DispatchQueue.main.sync {
+                    keyWindow = UIApplication.shared.windows.first { $0.isKeyWindow }
+                }
+                return keyWindow!
+            }
+        }()
 
         // Create semi-transparent overlay
         let overlay = UIView(frame: parentView?.bounds ?? .zero)

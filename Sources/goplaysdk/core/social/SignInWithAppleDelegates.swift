@@ -11,15 +11,21 @@ class SignInWithAppleDelegates: NSObject, ASAuthorizationControllerDelegate, ASA
 
     
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        // Get the key window properly (without UIKit UIApplication.shared)
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
-            fatalError("No UIWindowScene available")
+        var window: UIWindow?
+
+        DispatchQueue.main.sync {
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                window = scene.windows.first(where: { $0.isKeyWindow })
+            }
         }
-        guard let window = scene.windows.first(where: { $0.isKeyWindow }) else {
+
+        guard let keyWindow = window else {
             fatalError("No keyWindow found")
         }
-        return window
+
+        return keyWindow
     }
+
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
             if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {

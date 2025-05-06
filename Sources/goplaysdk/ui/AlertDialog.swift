@@ -51,19 +51,28 @@ class AlertDialog {
     }
 
     /// Get the top most view controller to present from
-    private func topViewController(base: UIViewController? = UIApplication.shared.connectedScenes
-        .compactMap { ($0 as? UIWindowScene)?.keyWindow }
-        .first?.rootViewController) -> UIViewController? {
+    private func topViewController(base: UIViewController? = nil) -> UIViewController? {
+        var baseVC: UIViewController?
 
-        if let nav = base as? UINavigationController {
+        // Ensure we access UIApplication/WindowScene on the main thread
+        DispatchQueue.main.sync {
+            let scene = UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .first
+
+            baseVC = base ?? scene?.keyWindow?.rootViewController
+        }
+
+        if let nav = baseVC as? UINavigationController {
             return topViewController(base: nav.visibleViewController)
         }
-        if let tab = base as? UITabBarController, let selected = tab.selectedViewController {
+        if let tab = baseVC as? UITabBarController, let selected = tab.selectedViewController {
             return topViewController(base: selected)
         }
-        if let presented = base?.presentedViewController {
+        if let presented = baseVC?.presentedViewController {
             return topViewController(base: presented)
         }
-        return base
+        return baseVC
     }
+
 }
