@@ -60,8 +60,9 @@ jobs:
         if: always()
         run: |
           STATUS="${{ job.status }}"
-          MESSAGE="✅ \*Tag & Release Completed\*\n\n\*Status:\* $STATUS\n\*Tag:\* \${{ steps.bump_version.outputs.new_tag }}\n\*Repo:\* [\${{ github.repository }}](https://github.com/\${{ github.repository }})"
+          MESSAGE="✅Status: ${{ steps.bump_version.outputs.new_tag }}\n Repo: [${{ github.repository }}](https://github.com/${{ github.repository }})"
 
+          echo "Message to be sent: $MESSAGE"
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
             -d text="$MESSAGE" \
