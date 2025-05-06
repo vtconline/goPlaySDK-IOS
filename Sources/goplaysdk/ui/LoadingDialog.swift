@@ -1,9 +1,4 @@
-//
-//  loadingDialog.swift
-//  goplaysdk
-//
-//  Created by Ngô Đồng on 17/4/25.
-//
+
 import UIKit
 @MainActor
 class LoadingDialog {
@@ -21,21 +16,21 @@ class LoadingDialog {
         guard overlayView == nil else { return } // Prevent showing multiple overlays
 
         // Get the main view (or fallback to key window)
-//        let parentView = view ?? UIApplication.shared.windows.first { $0.isKeyWindow }
-        let parentView: UIView = {
-            if let view = view {
-                return view
-            } else {
-                var keyWindow: UIWindow?
-                DispatchQueue.main.sync {
-                    keyWindow = UIApplication.shared.windows.first { $0.isKeyWindow }
-                }
-                return keyWindow!
-            }
-        }()
+        let parentView = view ?? UIApplication.shared.windows.first { $0.isKeyWindow }
+//        let parentView: UIView = {
+//            if let view = view {
+//                return view
+//            } else {
+//                var keyWindow: UIWindow?
+//                DispatchQueue.main.sync {
+//                    keyWindow = UIApplication.shared.windows.first { $0.isKeyWindow }
+//                }
+//                return keyWindow!
+//            }
+//        }()
 
         // Create semi-transparent overlay
-        let overlay = UIView(frame: parentView.bounds)
+        let overlay = UIView(frame: parentView!.bounds)
         overlay.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         //set touch on overlay -> prevent touch on below view
         overlay.isUserInteractionEnabled = true
@@ -57,7 +52,7 @@ class LoadingDialog {
         overlay.addSubview(spinner)
 
         // Add overlay to parent
-        parentView.addSubview(overlay)
+        parentView!.addSubview(overlay)
 
         // Store reference to remove later
         overlayView = overlay
@@ -65,8 +60,10 @@ class LoadingDialog {
 
     // Hide loading overlay
     func hide() {
-        overlayView?.removeFromSuperview()
-        overlayView = nil
+                        DispatchQueue.main.sync {
+                            overlayView?.removeFromSuperview()
+                            overlayView = nil
+                        }
     }
 }
 

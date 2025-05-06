@@ -147,10 +147,10 @@ public struct SocialLoginGroupView: View {
         // Now, you can call the `post` method on ApiService
         Task {
             await ApiService.shared.post(path: GoApi.oauthGuest, body: bodyData) { result in
-                DispatchQueue.main.async {
+                
                     
                     LoadingDialog.instance.hide();
-                }
+                
                 
                 switch result {
                 case .success(let data):
@@ -194,7 +194,7 @@ public struct SocialLoginGroupView: View {
         // This would be a sample data payload to send in the POST request
         var bodyData: [String: Any] = [
             "ggId": gId,
-            "ggEmail": gMail ?? "no email",
+            "ggEmail": gMail,
             "ggName": "",
             "code": "",//old sdk
             "token": token,
@@ -205,7 +205,7 @@ public struct SocialLoginGroupView: View {
         
         Task {
             await ApiService.shared.post(path: GoApi.oauthGoogle, body: bodyData) { result in
-                DispatchQueue.main.async {
+                
                     
                     LoadingDialog.instance.hide();
                     switch result {
@@ -224,7 +224,7 @@ public struct SocialLoginGroupView: View {
                         //                    print("Error: \(error.localizedDescription)")
                         AlertDialog.instance.show(message: error.localizedDescription)
                     }
-                }
+                
                 
                 
             }
@@ -245,7 +245,7 @@ public struct SocialLoginGroupView: View {
         delegate.onSignInResult = { result in
             switch result {
             case .success(let credential):
-                var userIdentifier = credential.user
+                let userIdentifier = credential.user
                 let fullName = credential.fullName //1st return only
                 let email = credential.email  //1st return only
                 
@@ -289,9 +289,7 @@ public struct SocialLoginGroupView: View {
     }
     
     private func requestLoginWithApple(appleId: String, appleMail: String?, token: String,name: String?) {
-        DispatchQueue.main.async {
-            LoadingDialog.instance.show();
-        }
+        LoadingDialog.instance.show();
         
         
         // This would be a sample data payload to send in the POST request
@@ -303,12 +301,12 @@ public struct SocialLoginGroupView: View {
         if(name != nil){
             bodyData["apName"] = name
         }
-        LoadingDialog.instance.show();
         Task {
             await ApiService.shared.post(path: GoApi.oauthApple, body: bodyData) { result in
-                DispatchQueue.main.async {
+                LoadingDialog.instance.hide();
+            
+        
                     
-                    LoadingDialog.instance.hide();
                     switch result {
                     case .success(let data):
                         // Handle successful response
@@ -325,7 +323,7 @@ public struct SocialLoginGroupView: View {
                         //                    print("Error: \(error.localizedDescription)")
                         AlertDialog.instance.show(message: error.localizedDescription)
                     }
-                }
+              
                 
                 
             }

@@ -149,10 +149,10 @@ public struct GoIdAuthenView: View {
         // Now, you can call the `post` method on ApiService
         Task {
             await ApiService.shared.post(path: GoApi.oauthLogin, body: bodyData) { result in
-                        DispatchQueue.main.async {
+                        
                          
                             LoadingDialog.instance.hide();
-                        }
+                        
                 
                 switch result {
                 case .success(let data):

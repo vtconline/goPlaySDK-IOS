@@ -140,10 +140,10 @@ public struct PhoneLoginView: View {
                 "loginType": LoginType.phone.rawValue
             ]
             await ApiService.shared.post(path: GoApi.oauthGetAuthenOtp, body: bodyData) { result in
-                        DispatchQueue.main.async {
+                        
                          
                             LoadingDialog.instance.hide();
-                        }
+                        
                 
                 switch result {
                 case .success(let data):
@@ -185,10 +185,10 @@ public struct PhoneLoginView: View {
         // Now, you can call the `post` method on ApiService
         Task {
             await ApiService.shared.post(path: GoApi.oauthCheckAuthenOtp, body: bodyData) { result in
-                        DispatchQueue.main.async {
+                        
                          
                             LoadingDialog.instance.hide();
-                        }
+                        
                 
                 switch result {
                 case .success(let data):
@@ -239,10 +239,10 @@ public struct PhoneLoginView: View {
         // Now, you can call the `post` method on ApiService
         Task {
             await ApiService.shared.post(path: GoApi.oauthLogin, body: bodyData) { result in
-                        DispatchQueue.main.async {
+                        
                          
                             LoadingDialog.instance.hide();
-                        }
+                        
                 
                 switch result {
                 case .success(let data):
