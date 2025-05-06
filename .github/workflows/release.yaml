@@ -7,29 +7,63 @@ on:
 
 jobs:
   release:
-    if: contains(github.event.head_commit.message, 'release')
+    if: contains(github.event.head_commit.message, 'release new version')
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Required to access all tags
 
-      - name: Extract version from Swift file
-        id: get_version
+      - name: Get latest tag
+        id: get_tag
         run: |
-          VERSION=$(grep -oE '\"[0-9]+\.[0-9]+\.[0-9]+\"' Sources/goplaysdk/version.swift | head -n 1 | tr -d '"')
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          TAG=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "Latest tag: $TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      # Patch: new_tag="v$major.$minor.$((patch+1))"
+      # Major: new_tag="v$((major+1)).0.0"
+      - name: Bump patch version
+        id: bump_version
+        run: |
+          old_tag="${{ steps.get_tag.outputs.tag }}"
+          if [[ $old_tag =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            major="${BASH_REMATCH[1]}"
+            minor="${BASH_REMATCH[2]}"
+            patch="${BASH_REMATCH[3]}"
+            new_tag="v$major.$minor.$((patch+1))"
+            echo "New tag: $new_tag"
+            
+            echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+          else
+            echo "Invalid tag format"
+            exit 1
+          fi
 
       - name: Create Git tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag v${{ steps.get_version.outputs.VERSION }}
-          git push origin v${{ steps.get_version.outputs.VERSION }}
+          git tag ${{ steps.bump_version.outputs.new_tag }}
+          git push origin ${{ steps.bump_version.outputs.new_tag }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          tag_name: ${{ steps.bump_version.outputs.new_tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Telegram
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          MESSAGE="✅ *Tag & Release Completed*\n\n*Status:* $STATUS\n*Tag:* ${{ steps.bump_version.outputs.new_tag }}\n*Repo:* [${{ github.repository }}](https://github.com/${{ github.repository }})"
+
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="$MESSAGE" \
+            -d parse_mode=Markdown
+

@@ -35,7 +35,7 @@ class LoadingDialog {
         }()
 
         // Create semi-transparent overlay
-        let overlay = UIView(frame: parentView?.bounds ?? .zero)
+        let overlay = UIView(frame: parentView.bounds)
         overlay.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         //set touch on overlay -> prevent touch on below view
         overlay.isUserInteractionEnabled = true
@@ -57,7 +57,7 @@ class LoadingDialog {
         overlay.addSubview(spinner)
 
         // Add overlay to parent
-        parentView?.addSubview(overlay)
+        parentView.addSubview(overlay)
 
         // Store reference to remove later
         overlayView = overlay
