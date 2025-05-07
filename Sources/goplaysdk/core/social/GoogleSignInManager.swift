@@ -4,7 +4,7 @@ import GoogleSignIn
 
 @MainActor
 public class GoogleSignInManager {
-    static let shared = GoogleSignInManager()
+    public static let shared = GoogleSignInManager()
 
     public func signIn(completion: @escaping (GIDSignInResult?, Error?) -> Void) {
         // Get the root view controller from the app

@@ -2,7 +2,7 @@ import Foundation
 @MainActor
 public class GoPlayUUID {
     
-    static let shared = GoPlayUUID()
+    public static let shared = GoPlayUUID()
     
     private let uuidKey = "userUUIDKey"
 

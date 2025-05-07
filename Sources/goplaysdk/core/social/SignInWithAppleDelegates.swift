@@ -5,7 +5,7 @@ import AuthenticationServices
 @MainActor
 public class SignInWithAppleDelegates: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     
-    static let shared = SignInWithAppleDelegates()
+    public static let shared = SignInWithAppleDelegates()
     
     
     
