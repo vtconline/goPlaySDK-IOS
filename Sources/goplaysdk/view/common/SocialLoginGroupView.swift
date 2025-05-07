@@ -251,7 +251,7 @@ public struct SocialLoginGroupView: View {
                 let userIdentifier = credential.user
                 let fullName = credential.fullName //1st return only
                 let email = credential.email  //1st return only
-                
+            
                 var finalEmail: String
                 var finalName: String
 
@@ -291,14 +291,15 @@ public struct SocialLoginGroupView: View {
         controller.performRequests()
     }
     
-    private func requestLoginWithApple(appleId: String, appleMail: String?, token: String,name: String?) {
+    private func requestLoginWithApple(appleId: String, appleMail: String, token: String,name: String?) {
         LoadingDialog.instance.show();
         
-        
+        let endIndex = token.index(token.startIndex, offsetBy: 10, limitedBy: token.endIndex) ?? token.endIndex
+        let substring = token[token.startIndex..<endIndex]
         // This would be a sample data payload to send in the POST request
         var bodyData: [String: Any] = [
-            "apId": appleId,
-            "apEmail": appleMail ?? "no email",
+            "apId": appleId.isEmpty ? substring : appleId,
+            "apEmail": appleMail.isEmpty ? "noemail@icloud.com" : appleMail,
             "token": token,
         ]
         if(name != nil){
