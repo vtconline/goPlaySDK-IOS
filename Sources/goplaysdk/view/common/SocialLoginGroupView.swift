@@ -278,7 +278,7 @@ public struct SocialLoginGroupView: View {
                     // Send `tokenString` to your backend for verification
                     print("🛡️ Identity Token: \(tokenString)")
                     
-                    requestLoginWithApple(appleId: userIdentifier, appleMail: finalEmail, token: tokenString, name: finalName);
+                    requestLoginWithApple(appleId: userIdentifier, appleMail: finalEmail, token: tokenString, name: finalName.trimmingCharacters(in: .whitespaces));
                     
                 }else{
                     print("✅ Successfully signed in with Apple! but identityToken is nil or empty")

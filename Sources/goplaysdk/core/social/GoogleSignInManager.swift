@@ -3,10 +3,10 @@
 import GoogleSignIn
 
 @MainActor
-class GoogleSignInManager {
+public class GoogleSignInManager {
     static let shared = GoogleSignInManager()
 
-    func signIn(completion: @escaping (GIDSignInResult?, Error?) -> Void) {
+    public func signIn(completion: @escaping (GIDSignInResult?, Error?) -> Void) {
         // Get the root view controller from the app
         topViewController { topVC in
             guard let topVC = topVC else { return }

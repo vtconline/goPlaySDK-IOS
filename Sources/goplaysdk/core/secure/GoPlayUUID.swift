@@ -5,8 +5,8 @@ public class GoPlayUUID {
     static let shared = GoPlayUUID()
     
     private let uuidKey = "userUUIDKey"
-    
-    var userUUID: String {
+
+    public var userUUID: String {
         if let storedUUID = loadUUID() {
             return storedUUID
         } else {
