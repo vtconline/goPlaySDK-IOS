@@ -90,7 +90,8 @@ class ApiService {
                     bodyMerge = mergedBody
                 }
                 print("requestBody before jwt \(requestBody)")
-                bodyParams["jwt"] = await generateSignature(data: requestBody) ?? ""
+                print("requestBody  bodyMerge \(bodyMerge)")
+                bodyParams["jwt"] = await generateSignature(data: bodyMerge) ?? ""
             } else {
                 bodyParams["jwt"] = KeychainHelper.loadCurrentSession()?.accessToken ?? ""
                 bodyParams["cid"] = clientId

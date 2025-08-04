@@ -19,10 +19,12 @@ public class AuthManager {
     }
     
     public func postEventProfile(sesion: GoPlaySession?, error: String?) {
-        if error != nil {
+        if sesion != nil {
             self.updateProfilePublisher.send(.success(sesion!))
-        } else {
+        }else if error != nil {
             self.updateProfilePublisher.send(.failure(error!))
+        } else {
+            self.updateProfilePublisher.send(.failure("Unknow"))
         }
     }
 }

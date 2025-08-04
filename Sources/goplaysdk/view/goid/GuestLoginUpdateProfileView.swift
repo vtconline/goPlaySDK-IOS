@@ -112,6 +112,8 @@ public struct GuestLoginUpdateProfileView: View {
             "password": passWord,
             "passwordmd5": Utils.md5(passWord),
         ]
+        var bodyMerge = Utils.getPartnerParams()
+        bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
    
         if(!email.isEmpty){
             let emailValidation = emailValidator.validate(text: email);
@@ -172,7 +174,7 @@ public struct GuestLoginUpdateProfileView: View {
                 let tokenData : TokenData = apiResponse.data!
                 if let session = GoPlaySession.deserialize(data: tokenData) {
                     KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
-                    AuthManager.shared.postEventLogin(sesion: session)
+                    AuthManager.shared.postEventProfile(sesion: session, error:nil)
                 }else{
                     AlertDialog.instance.show(message:"Không đọc được Token")
                 }
