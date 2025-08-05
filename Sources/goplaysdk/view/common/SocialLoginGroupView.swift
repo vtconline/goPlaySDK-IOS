@@ -142,7 +142,6 @@ public struct SocialLoginGroupView: View {
         // This would be a sample data payload to send in the POST request
         let bodyData: [String: Any] = [
             "email": GoPlayUUID.shared.userUUID,
-           
         ]
         
         // Now, you can call the `post` method on ApiService

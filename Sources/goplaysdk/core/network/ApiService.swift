@@ -1,60 +1,62 @@
 import Foundation
-import CryptoKit
-import JWTKit
+import SwiftJWT
 
 @MainActor
-class ApiService {
-    private var baseURL = GoApi.apiProduct  //GoApi.apiProduct
+public class ApiService {
+    private var isSandBox = false
+    private var baseURL = GoApi.apiSandbox
+
+    private var clientId: String = "2356aa1f65af420c"
+    private var clientSecret: String = "SwlDJHfkE8F8ldQr9wzwDF6jTMRG6+/5"
     
-    public let clientId: String = "29658d7cd198458a" // Au2  2025==>29658d7cd198458a  2020:2356aa1f65af420c
-    public let clientSecret: String = "63/k6+G2LQVrFUOUOMvPzhz2scuwlBSrPMq+8UpMBRfTuWVGL+Aa2Q5i7rLzIy20" // 2025==>63/k6+G2LQVrFUOUOMvPzhz2scuwlBSrPMq+8UpMBRfTuWVGL+Aa2Q5i7rLzIy20  2024 ==>SwlDJHfkE8F8ldQr9wzwDF6jTMRG6+/5
-    
-    // Signs and verifies JWTs
-    let keys = JWTKeyCollection()
-    
-    static let shared = ApiService()
-    private init()  {
-        
-    }
-    
-    private var isInitialized = false  // Flag to check if initialization is done
-    // This async function will handle the initialization.
+    public static let shared = ApiService()
+    private init() {}
+
+    private var isInitialized = false
+    private var signer: JWTSigner?
+
     func initJwtIfNeeded() async {
-        guard !isInitialized else { return }  // Only run this once
-        
+        guard !isInitialized else { return }
         isInitialized = true
-        print("Initializing JWT keys...")
+        print("Initializing JWT signer...")
         
-        // Perform your async JWT setup here
-        await keys.add(hmac: HMACKey(from: Data(clientSecret.utf8)), digestAlgorithm: .sha256)
-        // Optionally, add other keys with different configurations
-        // await keys.add(hmac: "secret", digestAlgorithm: .sha256, kid: "my-key")
+        let keyData = Data(clientSecret.utf8)
+        signer = JWTSigner.hs256(key: keyData)
         
-        print("JWT initialization complete.")
+        print("JWT signer ready.")
     }
-    
-    
-    // Add your token retrieval logic here
+
     private var bearerToken: String? {
-        // For example, from UserDefaults or Keychain
         return nil
     }
     
+    public func initWithKey(_ isSandBox: Bool,_ clientId: String,_ clientSecret: String) {
+        self.isSandBox = isSandBox
+        if self.isSandBox {
+            self.baseURL = GoApi.apiSandbox
+//            self.clientId = "2356aa1f65af420c"
+//            self.clientSecret  = "SwlDJHfkE8F8ldQr9wzwDF6jTMRG6+/5"
+        }else {
+            self.baseURL = GoApi.apiProduct
+//            self.clientId = "29658d7cd198458a"
+//            self.clientSecret  = "63/k6+G2LQVrFUOUOMvPzhz2scuwlBSrPMq+8UpMBRfTuWVGL+Aa2Q5i7rLzIy20"
+        }
+        self.clientId = clientId
+        self.clientSecret  = clientSecret
+    }
+
     func setBaseURL(_ newBaseURL: String) {
         self.baseURL = newBaseURL
     }
-    
-    // MARK: - Public GET Request
+
     func get(path: String, sign: Bool = true, completion: @escaping (Result<Data, Error>) -> Void) async {
         await request(method: "GET", path: path, sign: sign, completion: completion)
     }
-    
-    // MARK: - Public POST Request
-    func post(path: String, body: [String: Any], sign: Bool = true, useAcessToken:Bool = false, completion: @escaping (Result<Data, Error>) -> Void) async {
+
+    func post(path: String, body: [String: Any], sign: Bool = true, useAcessToken: Bool = false, completion: @escaping (Result<Data, Error>) -> Void) async {
         await request(method: "POST", path: path, body: body, sign: sign, completion: completion)
     }
-    
-    // MARK: - Private Core Request Method
+
     private func request(
         method: String,
         path: String,
@@ -67,42 +69,37 @@ class ApiService {
             return
         }
         print("url URL \(url)")
-        // Ensure JWT is initialized before making the request
+
         await initJwtIfNeeded()
         
         var request = URLRequest(url: url)
         request.httpMethod = method
         
-        var bodyParams : [String: Any] = [:]
-        var bodyMerge: [String: Any]? = body  // Let's assume body is provided earlie
-        
-        
+        let partnerParams = Utils.getPartnerParams()
+        var bodyParams: [String: Any] = [:]
+        var bodyMerge: [String: Any]? = body
+
         if method == "POST", var requestBody = bodyMerge {
             if sign {
-                // Append data from getPartnerParams to requestBody
-                
                 if var mergedBody = bodyMerge {
-                
-                    let partnerParams = Utils.getPartnerParams()
+//                    let partnerParams = Utils.getPartnerParams()
                     mergedBody = mergedBody.merging(partnerParams) { current, _ in current }
-
-                    // Update the bodyMerge to the mergedBody
                     bodyMerge = mergedBody
                 }
                 print("requestBody before jwt \(requestBody)")
-                print("requestBody  bodyMerge \(bodyMerge)")
                 bodyParams["jwt"] = await generateSignature(data: bodyMerge) ?? ""
             } else {
                 bodyParams["jwt"] = KeychainHelper.loadCurrentSession()?.accessToken ?? ""
                 bodyParams["cid"] = clientId
-                bodyParams["clientId"] = clientId //old version
+                bodyParams["clientId"] = clientId
+                bodyParams = bodyParams.merging(partnerParams ?? [:]) { current, _ in current }
                 bodyParams = bodyParams.merging(bodyMerge ?? [:]) { current, _ in current }
             }
-            
+
             if let token = bearerToken {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             }
-            
+
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: bodyParams, options: [])
@@ -112,7 +109,7 @@ class ApiService {
                 return
             }
         }
-        
+
         let task = URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
                 completion(.failure(error))
@@ -126,50 +123,33 @@ class ApiService {
                 completion(.failure(error))
             }
         }
-        
+
         task.resume()
     }
-    
-    // MARK: - Helper: Generate Signature
-    
-    // Define the JWT payload outside the function to avoid redefining
-    struct MyPayload: JWTPayload {
-        func verify(using algorithm: some JWTKit.JWTAlgorithm) async throws {
-            
-        }
-        
+
+    // MARK: - SwiftJWT Claims
+    struct MyClaims: Claims {
         var jti: String
         var iss: String
         var nbf: Int
         var exp: Int
         var sid: Int
         var jdt: String
-        
-        //        func verify(using signer: JWTSigner) throws {
-        //            // Optional: Verify expiration or not-before if needed
-        //        }
     }
-    
-    struct ExamplePayload: JWTPayload {
-        var sub: SubjectClaim
-        var exp: ExpirationClaim
-        var admin: BoolClaim
-        
-        func verify(using key: some JWTAlgorithm) throws {
-            try self.exp.verifyNotExpired()
+
+    func generateSignature(data: Any) async -> String? {
+        await initJwtIfNeeded()
+
+        guard let signer = signer else {
+            print("Signer not initialized")
+            return nil
         }
-    }
-    
-    func generateSignature( data: Any) async -> String?{
+
         let jti = Int64(Date().timeIntervalSince1970 * 1000)
         let nbf = jti / 1000
         let exp = nbf + 60
-        
-        
+
         do {
-            
-            
-            // Serialize data to a JSON string, or fallback to description
             let jsonData: String
             if let json = try? JSONSerialization.data(withJSONObject: data),
                let jsonStr = String(data: json, encoding: .utf8) {
@@ -177,9 +157,8 @@ class ApiService {
             } else {
                 jsonData = String(describing: data)
             }
-            
-            // Create JWT payload
-            let payload = MyPayload(
+
+            let claims = MyClaims(
                 jti: String(jti),
                 iss: clientId,
                 nbf: Int(nbf),
@@ -187,18 +166,14 @@ class ApiService {
                 sid: 0,
                 jdt: jsonData
             )
-            
-            // Sign JWT
-            // Sign the payload, returning the JWT as String
-            let jwt = try await keys.sign(payload)//, kid: "my-key"
-//            print("jwt \(jwt)")
-            
-            return jwt
-            
+
+            var jwt = JWT(claims: claims)
+            let signedToken = try jwt.sign(using: signer)
+            print("jwt \(signedToken)")
+            return signedToken
         } catch {
-            print(error)
-            
+            print("JWT signing error: \(error)")
+            return nil
         }
-        return nil
     }
 }

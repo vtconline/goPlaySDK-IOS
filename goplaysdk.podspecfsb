@@ -1,0 +1,19 @@
+Pod::Spec.new do |s|
+  s.name             = 'goplaysdk'
+  s.version          = '1.0.6'
+  s.summary          = 'Official CocoaPods wrapper for GoPlaySDK.'
+  s.homepage         = 'https://github.com/vtconline/goPlaySDK-IOS'
+  s.license          = { :type => 'MIT', :file => 'LICENSE' }
+  s.author           = { 'Your Name or Org' => 'your@email.com' }
+  s.source           = { :git => 'https://github.com/vtconline/goPlaySDK-IOS.git', :tag => s.version.to_s }
+  s.platform         = :ios, '15.0'
+  s.ios.deployment_target = '15.0'
+  s.swift_version    = '5.0'
+  s.requires_arc     = true
+
+  s.source_files     = 'Sources/goplaysdk/**/*.{swift,h,m}'
+  s.resources        = ['Sources/images/**/*']
+
+  s.dependency 'GoogleSignIn', '~> 7.0'
+  s.dependency 'SwiftJWT', '~> 3.6'
+end
