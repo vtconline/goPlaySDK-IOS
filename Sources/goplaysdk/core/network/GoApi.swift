@@ -1,6 +1,7 @@
 
 
 public enum GoApi {
+    
     static let apiSandbox = "https://dev-api.goplay.vn/core/v1/"
     static let apiProduct = "https://api.goplay.vn/core/v1/"
     static let oauthConfig = "authen-service/oauth/getconfig"
