@@ -2,8 +2,8 @@ import UIKit
 import SwiftUI
 
 @MainActor
-class AlertDialog {
-    static let instance = AlertDialog()
+public class AlertDialog {
+    public static let instance = AlertDialog()
     private init() {}
 
     /// Show alert dialog
@@ -15,7 +15,7 @@ class AlertDialog {
     ///   - cancelTitle: optional text for Cancel button
     ///   - onOk: optional callback when OK is tapped
     ///   - onCancel: optional callback when Cancel is tapped
-    func show(
+    public func show(
         title: String? = nil,
         message: String,
         okTitle: String = "OK",

@@ -2,19 +2,14 @@
 //  keychainHelper.swift
 //  goplaysdk
 //
-//  Created by Ngô Đồng on 24/4/25.
+// 
 //
 
 import Foundation
 import Security
 class KeychainHelper {
-    @MainActor static  var goPlaySession : GoPlaySession? = nil
     @MainActor static func loadCurrentSession() -> GoPlaySession?{
-        if goPlaySession != nil {
-            return goPlaySession
-        }
             if let loadedSession: GoPlaySession = KeychainHelper.load(key: GoConstants.goPlaySession, type: GoPlaySession.self) {
-                goPlaySession = loadedSession
                 return loadedSession
             }
         return nil
@@ -63,7 +58,7 @@ class KeychainHelper {
                 let decodedObject = try decoder.decode(T.self, from: data)
                 return decodedObject
             } catch {
-                print("Failed to decode \(T.self) data: \(error.localizedDescription)")
+                print("KeyChianHelper:Failed to decode \(T.self) key: \(key) , data: \(error.localizedDescription)")
             }
         }
         return nil
@@ -93,7 +88,7 @@ class KeychainHelper {
 
 
     
-    func clearSavedData() {
+    static func clearSavedData() {
         // Clear username from UserDefaults
         UserDefaults.standard.removeObject(forKey: "savedUsername")
         

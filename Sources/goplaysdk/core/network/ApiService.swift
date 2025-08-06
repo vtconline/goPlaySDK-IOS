@@ -6,8 +6,8 @@ public class ApiService {
     private var isSandBox = false
     private var baseURL = GoApi.apiSandbox
 
-    private var clientId: String = "2356aa1f65af420c"
-    private var clientSecret: String = "SwlDJHfkE8F8ldQr9wzwDF6jTMRG6+/5"
+    public var clientId: String = "2356aa1f65af420c"
+    public var clientSecret: String = "SwlDJHfkE8F8ldQr9wzwDF6jTMRG6+/5"
     
     public static let shared = ApiService()
     private init() {}
@@ -53,7 +53,7 @@ public class ApiService {
         await request(method: "GET", path: path, sign: sign, completion: completion)
     }
 
-    func post(path: String, body: [String: Any], sign: Bool = true, useAcessToken: Bool = false, completion: @escaping (Result<Data, Error>) -> Void) async {
+    func post(path: String, body: [String: Any], sign: Bool = true, completion: @escaping (Result<Data, Error>) -> Void) async {
         await request(method: "POST", path: path, body: body, sign: sign, completion: completion)
     }
 
@@ -89,11 +89,19 @@ public class ApiService {
                 print("requestBody before jwt \(requestBody)")
                 bodyParams["jwt"] = await generateSignature(data: bodyMerge) ?? ""
             } else {
-                bodyParams["jwt"] = KeychainHelper.loadCurrentSession()?.accessToken ?? ""
+                
+        
                 bodyParams["cid"] = clientId
                 bodyParams["clientId"] = clientId
                 bodyParams = bodyParams.merging(partnerParams ?? [:]) { current, _ in current }
                 bodyParams = bodyParams.merging(bodyMerge ?? [:]) { current, _ in current }
+                if bodyParams.keys.contains("jwt") {
+                    print("✅ bodyParams chứa key jwt ==> no add \(bodyParams)")
+                } else {
+                    bodyParams["jwt"] = KeychainHelper.loadCurrentSession()?.accessToken ?? ""
+                }
+//                print("requestBody bodyMerge no sign  \(bodyMerge)")
+                print("requestBody bodyParams no sign  \(bodyParams)")
             }
 
             if let token = bearerToken {
