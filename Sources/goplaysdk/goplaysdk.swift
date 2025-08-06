@@ -13,7 +13,7 @@ import UIKit
         super.init()
     }
     
-    private var goPlayConfig: GoPlayConfig? = nil
+    public var goPlayConfig: GoPlayConfig? = nil
     
     private var _isGetConfig: Bool = false
     private var isManualClick: Bool = false

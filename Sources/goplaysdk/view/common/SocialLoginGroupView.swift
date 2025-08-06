@@ -178,29 +178,31 @@ public struct SocialLoginGroupView: View {
             if let error = error {
                 AlertDialog.instance.show(message: error.localizedDescription)
             } else if let user = user {
-                //                                    userName = user.profile.name
+                //userName = user.profile.name
+//                print("user.serverAuthCode \(user.serverAuthCode)")
                 if let profile = user.user.profile, profile != nil{
                     let idToken = user.user.idToken?.tokenString ?? ""
-                    requestLoginWithGoogle(gId: user.user.userID ?? "", gMail: profile.email, token: idToken, name: profile.name)
+                
+                    requestLoginWithGoogle(gId: user.user.userID ?? "", gMail: profile.email, authenCode: user.serverAuthCode ?? "", name: profile.name)
                 }
                 
             }
         }
     }
     
-    private func requestLoginWithGoogle(gId: String, gMail: String, token: String,name: String) {
+    private func requestLoginWithGoogle(gId: String, gMail: String, authenCode: String,name: String) {
         LoadingDialog.instance.show();
         
         // This would be a sample data payload to send in the POST request
         var bodyData: [String: Any] = [
             "ggId": gId,
             "ggEmail": gMail,
-            "ggName": "",
-            "code": "",//old sdk
-            "token": token,
+//            "ggName": "",
+            "code": authenCode,//old sdk
+//            "token": token,//new sdk
         ]
         if(name != nil){
-            bodyData["apName"] = name
+            bodyData["ggName"] = name
         }
         
         Task {
@@ -215,16 +217,16 @@ public struct SocialLoginGroupView: View {
                         // Parse the response if necessary
                         if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []),
                            let responseDict = jsonResponse as? [String: Any] {
-                            print("requestLoginWithGoogle Response: \(responseDict)")
-                            DispatchQueue.main.sync {
-                                onLoginResponse(response: responseDict)
-                            }
+                            print("requestLoginWithGoogle done Response: \(responseDict)")
+                            //nếu đã login gg -> update tk sang goId vi du sdkgoogle01/pwd..
+                            //sau đó login lại = gg thì sẽ báo Tài khoản đã được unlink
+                            //tức ko cho phép login tiếp = tk gg đã được sử dụng trước đó
+                            onLoginResponse(response: responseDict)
                             
                         }
                         
                     case .failure(let error):
-                        // Handle failure response
-                        //                    print("Error: \(error.localizedDescription)")
+                        print("requestLoginWithGoogle error Response:")
                         AlertDialog.instance.show(message: error.localizedDescription)
                     }
                 
@@ -276,7 +278,7 @@ public struct SocialLoginGroupView: View {
                 if let identityToken = credential.identityToken,
                    let tokenString = String(data: identityToken, encoding: .utf8) {
                     // Send `tokenString` to your backend for verification
-                    print("🛡️ Identity Token: \(tokenString)")
+//                    print("🛡️ Identity Token: \(tokenString)")
                     
                     requestLoginWithApple(appleId: userIdentifier, appleMail: finalEmail, token: tokenString, name: finalName.trimmingCharacters(in: .whitespaces));
                     
@@ -346,7 +348,7 @@ public struct SocialLoginGroupView: View {
             
             if apiResponse.isSuccess() {
                 
-                print("onLoginResponse onRequestSuccess userName: \(apiResponse.data?.accessToken ?? "")")
+//                print("onLoginResponse onRequestSuccess userName: \(apiResponse.data?.accessToken ?? "")")
                 if(apiResponse.data != nil){
                     let tokenData : TokenData = apiResponse.data!
                     if let session = GoPlaySession.deserialize(data: tokenData) {

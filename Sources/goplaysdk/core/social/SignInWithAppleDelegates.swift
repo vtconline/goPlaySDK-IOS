@@ -22,7 +22,7 @@ public class SignInWithAppleDelegates: NSObject, ASAuthorizationControllerDelega
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         var window: UIWindow?
 
-        DispatchQueue.main.sync {
+        DispatchQueue.main.async {
             if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
                 window = scene.windows.first(where: { $0.isKeyWindow })
             }

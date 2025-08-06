@@ -6,14 +6,35 @@ import GoogleSignIn
 public class GoogleSignInManager {
     public static let shared = GoogleSignInManager()
 
+    public func signOut() {
+        GIDSignIn.sharedInstance.signOut()
+    }
+    
+    public func signOutAndRevokToken(){
+        GIDSignIn.sharedInstance.disconnect { error in
+            if let error = error {
+                print("❌ Disconnect failed:", error.localizedDescription)
+            } else {
+                print("✅ User disconnected from Google.")
+            }
+        }
+    }
     public func signIn(completion: @escaping (GIDSignInResult?, Error?) -> Void) {
         // Get the root view controller from the app
         topViewController { topVC in
             guard let topVC = topVC else { return }
-            // Set up Google Sign-In with the correct client ID and presenting view controller
-    //        GIDSignIn.sharedInstance.clientID =oogleusercontent.com"
+            // https://console.cloud.google.com/apis/credentials?inv=1&invt=Ab4wnA&project=goidauthen
+            //webClientID phải có thì mới trả về authenCode
+            
+//            let iosClientID = "968111791801-6f22l6stb4g3ru8ar7r82j8ddrq49r97.apps.googleusercontent.com"
+            let iosClientID = Bundle.main.infoDictionary?["GIDClientID"] as? String ?? "968111791801-6f22l6stb4g3ru8ar7r82j8ddrq49r97.apps.googleusercontent.com"
+
+            let webClientID = GoPlaySDK.instance.goPlayConfig?.googleClientId ?? "968111791801-up5hvsuofg6o1e3n9m4ue1uqa258on3k.apps.googleusercontent.com" ;
+                
+            let config = GIDConfiguration(clientID: iosClientID, serverClientID: webClientID)
+            GIDSignIn.sharedInstance.configuration = config
             GIDSignIn.sharedInstance.signIn(
-                withPresenting: topVC // "36318724422-hbqlqt43bcs4qb81i3f872l7dh2hphvv.apps.g Provide the presenting view controller here
+                withPresenting: topVC
             ) { user, error in
                 completion(user, error)
                 

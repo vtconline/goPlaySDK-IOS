@@ -268,6 +268,7 @@ public struct PhoneLoginView: View {
    
     func checkOtpResponse(response: [String: Any]) {
         do {
+        
             let jsonData = try JSONSerialization.data(withJSONObject: response, options: [])
             let apiResponse =  try JSONDecoder().decode(GoPlayApiResponse<Int>.self, from: jsonData)
             
@@ -275,26 +276,32 @@ public struct PhoneLoginView: View {
             var haveError = true
 
             if apiResponse.isSuccess() {
-                
-                print("checkOtpResponse onRequestSuccess data: \(apiResponse.data ?? 0)")
-                let timeCountDown = apiResponse.data!
+//                print("checkOtpResponse onRequestSuccess data: \(apiResponse.data ?? 0)")
+            
+                let timeCountDown: Int =  (apiResponse.data as? Int) ?? 0
+
+                print("checkOtpResponse onRequestSuccess data: \(timeCountDown)")
                 if timeCountDown > 0 {
                     haveError = false
                    isButtonOtpDisabled = true
-
-                    Utils.startCountdown(
-                        totalSeconds: timeCountDown,
-                        onTick: { secondsLeft in
-                            let minutes = secondsLeft / 60
-                            let seconds = secondsLeft % 60
-                            buttonOtpText = String(format: "%02d:%02d", minutes, seconds)
-                           
-                        },
-                        onFinish: {
-                            isButtonOtpDisabled = false
-                            buttonOtpText = ""
-                        }
-                    )
+                    DispatchQueue.main.async{
+                        Utils.startCountdown(
+                            totalSeconds: timeCountDown,
+                            onTick: { secondsLeft in
+                                let minutes = secondsLeft / 60
+                                let seconds = secondsLeft % 60
+                                print("checkOtpResponse tick data: \(minutes) \(seconds)")
+                                buttonOtpText = String(format: "%02d:%02d", minutes, seconds)
+                               
+                            },
+                            onFinish: {
+                                print("onFinish tick: ")
+                                isButtonOtpDisabled = false
+                                buttonOtpText = ""
+                            }
+                        )
+                    }
+                    
                 } else {
                     message = apiResponse.message.isEmpty ? "Có lỗi. Vui lòng lấy OTP mới" : apiResponse.message
                 }

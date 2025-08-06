@@ -86,7 +86,7 @@ public class ApiService {
                     mergedBody = mergedBody.merging(partnerParams) { current, _ in current }
                     bodyMerge = mergedBody
                 }
-                print("requestBody before jwt \(requestBody)")
+//                print("requestBody before jwt \(requestBody)")
                 bodyParams["jwt"] = await generateSignature(data: bodyMerge) ?? ""
             } else {
                 

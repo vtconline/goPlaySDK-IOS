@@ -10,20 +10,22 @@ public class Utils {
         onTick: @escaping (_ secondsLeft: Int) -> Void,
         onFinish: @escaping () -> Void
     ) -> Timer {
-        var secondsLeft = totalSeconds
+        //must run in main thread, neu call inside Task{...} sẽ ko chay
+        // ==> DispatchQueue.main.async {Utils.startCountdown(...)}
+    
+        var secondsRemain = totalSeconds
+        let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timerrr in
+            secondsRemain -= 1
+            onTick(secondsRemain)
 
-        let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            secondsLeft -= 1
-            onTick(secondsLeft)
-
-            if secondsLeft <= 0 {
-                timer.invalidate()
+            if secondsRemain <= 0 {
+                timerrr.invalidate()
                 onFinish()
             }
         }
 
         // Fire the first tick immediately (optional)
-        onTick(secondsLeft)
+        onTick(secondsRemain)
 
         return timer
     }
