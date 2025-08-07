@@ -4,6 +4,8 @@
 
 import Foundation
 import UIKit
+import SwiftUICore
+import SwiftUI
 
 @MainActor
 @objc public class GoPlaySDK: NSObject {
@@ -32,6 +34,31 @@ import UIKit
     ) {
         ApiService.shared.initWithKey(isSandBox, clientId, clientSecret)
         self.getRemoteConfig()
+    }
+    
+    @objc(getGoPlayLoginView:)
+    public func getGoPlayView(type: Int)
+        -> UIViewController
+    {
+        let view: AnyView
+        switch type {
+        case GoSwiftViewType.selectView:
+            view = AnyView(GoPlayMainView())
+        case GoSwiftViewType.phone:
+            view = AnyView(GoPlayPhoneLoginViewObjC())
+        case GoSwiftViewType.goid:
+            view = AnyView(GoPlayGoIdLoginViewObjC())
+        case GoSwiftViewType.updateProfile:
+            view = AnyView(GuestLoginUpdateProfileViewObjC())
+        default:
+            view = AnyView(GoPlayPhoneLoginViewObjC())
+        }
+
+        let controller = UIHostingController(rootView: view)
+        //ensure fullscreen
+        controller.modalPresentationStyle = .fullScreen
+//        hostingController = controller
+        return controller
     }
 
     @objc public func application(
@@ -236,6 +263,11 @@ import UIKit
                             error: nil
                         )
 
+                    }else{
+                        AlertDialog.instance.show(message: apiResponse.message ?? "Đăng xuất thất bại")
+                        // AuthManager.shared.postEventLogout(
+                        //     error: apiResponse.message
+                        // )
                     }
 
                 } catch {

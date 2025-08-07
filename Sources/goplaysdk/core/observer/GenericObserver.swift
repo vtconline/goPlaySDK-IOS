@@ -111,6 +111,7 @@ import Foundation
 
                 if target.responds(to: selector) {
                     _ = target.perform(selector, with: result)
+//                    print("✅ phản hồi selector: \(selector)")
                 } else {
 //                    print("❌ Không phản hồi selector: \(selector)")
                 }
@@ -166,25 +167,25 @@ import Foundation
         AnyObject, Never
     >? {
         switch action {
-        case GoPlayAction.loginResult:
+        case GoPlayEvent.loginResult:
             return AuthManager.shared.loginResultPublisher
                 .map { $0 as AnyObject }
                 .eraseToAnyPublisher()
-        case GoPlayAction.logoutResult:
+        case GoPlayEvent.logoutResult:
             return AuthManager.shared.logoutResultPublisher
                 .map { $0 as AnyObject }
                 .eraseToAnyPublisher()
-        case GoPlayAction.openUpdateProfile:
-            return AuthManager.shared.updateProfilePublisher
+        case GoPlayEvent.linkingAccount:
+            return AuthManager.shared.accountLinkingPublisher
                 .map { $0 as AnyObject }
                 .eraseToAnyPublisher()
-        case GoPlayAction.tokenExpire:
+        case GoPlayEvent.tokenExpire:
             return AuthManager.shared.resResultPublisher
                 .map { $0 as AnyObject }
                 .eraseToAnyPublisher()
 
         default:
-            print("resolvePublisher:: must return != nil if want event get fire!!!")
+            print("GoPlaySDK::GenericObserver.resolvePublisher:: must return != nil if want event get fire!!!")
             return nil
         }
     }

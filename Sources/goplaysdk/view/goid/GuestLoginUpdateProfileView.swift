@@ -194,7 +194,7 @@ public struct GuestLoginUpdateProfileView: View {
                         key: GoConstants.goPlaySession,
                         data: session
                     )
-                    AuthManager.shared.postEventProfile(
+                    AuthManager.shared.postEventAccountLinking(
                         session: session,
                         error: nil
                     )
@@ -208,7 +208,7 @@ public struct GuestLoginUpdateProfileView: View {
             }
 
         } catch {
-            print("error register \(error)")
+            print("error linking \(error)")
             AlertDialog.instance.show(message: error.localizedDescription)
         }
     }

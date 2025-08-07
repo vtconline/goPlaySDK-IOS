@@ -46,13 +46,20 @@ public struct GoIdAuthenView: View {
                 //                keyBoardFocused: $passwordFocus
             )
             .keyboardType(.default)
-            
+            //KeychainHelper.remove(key: "savedPassword")
             Toggle("Ghi nhớ đăng nhập", isOn: $rememberMe)
 //                .padding(.horizontal, 32)
                 .frame(maxWidth: min(
                     UIScreen.main.bounds.width - 2 * AppTheme.Paddings.horizontal,
                     300
                 ), alignment: .center)
+                .onChange(of: rememberMe) { newValue in
+                            print("✅ rememberMe: \(newValue ? "On" : "Off")")
+                            // 👉 Gọi callback tại đây
+                            if(!newValue){
+                                KeychainHelper.remove(key: "savedPassword")
+                            }
+                        }
             
             GoButton(text: "Đăng nhập", action:submitLoginGoId)
             
@@ -129,6 +136,8 @@ public struct GoIdAuthenView: View {
             if let pwdData = password.data(using: .utf8) {
                 KeychainHelper.save(key: "savedPassword", data: pwdData)
             }
+        } else {
+            KeychainHelper.remove(key: "savedPassword")
         }
 //                guard !phoneNumber.isEmpty, !otp.isEmpty else {
 //                    alertMessage = "Vui lòng nhập SĐT và otp"

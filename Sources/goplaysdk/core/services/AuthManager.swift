@@ -15,8 +15,8 @@ import Foundation
     public let logoutResultPublisher = PassthroughSubject<
         LogoutResultObjC, Never
     >()
-    public let updateProfilePublisher = PassthroughSubject<
-        UpdateProfileObjC, Never
+    public let accountLinkingPublisher = PassthroughSubject<
+        AccountLinkingObjC, Never
     >()
     
     public let resResultPublisher = PassthroughSubject<
@@ -71,17 +71,23 @@ import Foundation
         }
     }
 
-    @objc public func postEventProfile(session: GoPlaySession?, error: String?)
+    @objc public func postEventAccountLinking(session: GoPlaySession?, error: String?)
     {
         DispatchQueue.main.async {
             //run on main thread, prevent crash in objc project if use this lib
             if let session = session {
-                self.updateProfilePublisher.send(
-                    UpdateProfileObjC(session: session)
+                self.accountLinkingPublisher.send(
+                    AccountLinkingObjC(session: session)
                 )
             } else {
-                self.updateProfilePublisher.send(
-                    UpdateProfileObjC(errorMessage: error ?? "Unknown error")
+                let err = NSError(
+                    domain: error == nil || error == ""
+                        ? "LinkingSuccess" : "LinkingError",
+                    code: error == nil || error == "" ? 0 : -1,
+                    userInfo: [NSLocalizedDescriptionKey: error ?? "Unknown error"]
+                )
+                self.accountLinkingPublisher.send(
+                    AccountLinkingObjC(error:err)
                 )
             }
         }
@@ -110,18 +116,18 @@ import Foundation
     }
 }
 
-@objc public class UpdateProfileObjC: NSObject {
+@objc public class AccountLinkingObjC: NSObject {
     @objc public let session: GoPlaySession?
-    @objc public let errorMessage: String?
+    @objc public let error: NSError?
 
     @objc public init(session: GoPlaySession) {
         self.session = session
-        self.errorMessage = nil
+        self.error = nil
     }
 
-    @objc public init(errorMessage: String) {
+    @objc public init(error: NSError) {
         self.session = nil
-        self.errorMessage = errorMessage
+        self.error = error
     }
 
     @objc public var isSuccess: Bool {

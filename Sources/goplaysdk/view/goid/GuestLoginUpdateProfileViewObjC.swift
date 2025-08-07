@@ -1,26 +1,25 @@
-
-
-
 import SwiftUI
 
-public struct GoPlayPhoneLoginViewObjC: View {
-    public init() {}
+public struct GuestLoginUpdateProfileViewObjC: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            // Kiểm tra nếu là iOS 16 trở lên, dùng NavigationStack
+            HeaderView()
             if #available(iOS 16.0, *) {
                 NavigationStack {
-                    PhoneLoginView()
+                    GuestLoginUpdateProfileView()
                 }
             } else {
                 // Nếu iOS < 16, dùng NavigationView
                 NavigationView {
-                    PhoneLoginView()
+                    GuestLoginUpdateProfileView()
                 }
             }
         }
+
+        
+
     }
+
+   
 }
-
-
