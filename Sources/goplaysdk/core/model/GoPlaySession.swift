@@ -1,13 +1,14 @@
 
 import Foundation
 
-public struct GoPlaySession: Codable {
-    public var  accessToken: String? = nil
-    public var  refreshToken: String? = nil
-    public var  expiresIn: Int = 0
-    public var  userId: Int64 = 0
-    public var userName: String? = nil
-    public var  accountType: Int = 0
+
+@objc public class GoPlaySession: NSObject,Codable {
+    @objc public var  accessToken: String? = nil
+    @objc public var  refreshToken: String? = nil
+    @objc public var  expiresIn: Int = 0
+    @objc public var  userId: Int64 = 0
+    @objc public var userName: String? = nil
+    @objc public var  accountType: Int = 0
 
     enum CodingKeys: String, CodingKey {
         case accessToken

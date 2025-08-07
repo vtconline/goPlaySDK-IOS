@@ -1,11 +1,14 @@
+import Foundation
 
-public enum GoPlayAction {
-    public static let loginResult = "loginResult"
-    public static let openUpdateProfile = "openUpdateProfile"
-    public static let loginSuccess = "com.scoin.login.success"
-    public static let loginError = "com.scoin.login.error"
-    public static let loginCancel = "com.scoin.login.cancel"
-    public static let logoutSuccess = "com.scoin.logout.success"
-    public static let logoutError = "com.scoin.logout.error"
-    public static let updateSuccess = "com.scoin.update.success"
+@objc public class GoPlayAction: NSObject {
+    @objc public static let loginResult = "loginResult"
+    @objc public static let logoutResult = "logoutResult"
+    @objc public static let openUpdateProfile = "openUpdateProfile"
+    @objc public static let tokenExpire = "tokenExpire"
+//    @objc public static let loginSuccess = "com.scoin.login.success"
+//    @objc public static let loginError = "com.scoin.login.error"
+//    @objc public static let loginCancel = "com.scoin.login.cancel"
+//    @objc public static let logoutSuccess = "com.scoin.logout.success"
+//    @objc public static let logoutError = "com.scoin.logout.error"
+//    @objc public static let updateSuccess = "com.scoin.update.success"
 }

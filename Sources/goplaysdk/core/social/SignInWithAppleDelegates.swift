@@ -8,6 +8,10 @@ public class SignInWithAppleDelegates: NSObject, ASAuthorizationControllerDelega
     public static let shared = SignInWithAppleDelegates()
     
     
+    public func logOut() {
+//        print("👋 Logged out from Apple ID")
+    }
+    
     
     var onSignInResult: ((Result<ASAuthorizationAppleIDCredential, Error>) -> Void)?
     

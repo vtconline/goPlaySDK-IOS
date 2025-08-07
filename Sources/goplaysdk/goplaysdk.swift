@@ -8,23 +8,23 @@ import UIKit
 @MainActor
 @objc public class GoPlaySDK: NSObject {
     @objc public static let instance = GoPlaySDK()
-    
+
     private override init() {
         super.init()
     }
-    
+
     public var goPlayConfig: GoPlayConfig? = nil
-    
+
     private var _isGetConfig: Bool = false
     private var isManualClick: Bool = false
-    
+
     private var _autoLogin: Bool = true
-    
-    public var autoLogin: Bool {
+
+    @objc public var autoLogin: Bool {
         get { return _autoLogin }
         set { _autoLogin = newValue }
     }
-    
+
     @objc public func initSDK(
         _ isSandBox: Bool,
         _ clientId: String,
@@ -33,7 +33,7 @@ import UIKit
         ApiService.shared.initWithKey(isSandBox, clientId, clientSecret)
         self.getRemoteConfig()
     }
-    
+
     @objc public func application(
         _ app: UIApplication,
         open url: URL,
@@ -45,7 +45,7 @@ import UIKit
             options: options
         )
     }
-    
+
     @objc public func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication
@@ -57,7 +57,7 @@ import UIKit
             didFinishLaunchingWithOptions: launchOptions
         )
     }
-    
+
     @objc public func logEventFB(
         eventName: String,
         parameters: [String: Any]? = nil
@@ -67,7 +67,7 @@ import UIKit
             parameters: parameters
         )
     }
-    
+
     @objc public func logEvent(
         _ eventName: String,
         _ parameters: [String: Any]? = nil
@@ -77,15 +77,15 @@ import UIKit
             parameters: parameters
         )
     }
-    
+
     @objc public func recordError(_ error: NSError) {
         GoPlayFirebaseSDK.shared.recordError(error)
     }
-    
+
     @objc public func getScreenWidth() -> CGFloat {
         return UIScreen.main.bounds.width
     }
-    
+
     @objc func getRemoteConfig() {
         GoApiService.shared.getRemoteConfig(
             success: { (configDict: [String: Any]) in
@@ -97,13 +97,13 @@ import UIKit
                         withJSONObject: configDict,
                         options: []
                     )
-                    
+
                     // Decode JSON Data -> GoPlayConfig
                     self.goPlayConfig = try JSONDecoder().decode(
                         GoPlayConfig.self,
                         from: jsonData
                     )
-                    
+
                     //print("✅ Config decoded:", self.goPlayConfig)
                     print(
                         "✅ Config decoded googleClientId:",
@@ -114,15 +114,15 @@ import UIKit
                     {
                         //TODO :: update google client id
                     }
-                    
+
                 } catch {
                     print("❌ Failed to decode GoPlayConfig:", error)
                 }
-                
+
                 if self.autoLogin || self.isManualClick {
                     self.savedUserServer()
                 }
-                
+
             },
             failure: { (error: Error) in
                 print("❌ Remote Config Failed:", error.localizedDescription)
@@ -133,64 +133,150 @@ import UIKit
             }
         )
     }
-    
+
     @objc func savedUserServer() {
         GoApiService.shared.checkDevice(
             success: { (configDict: [String: Any]) in
                 print("checkDevice done :", configDict)
-                
+
                 do {
                     // Convert Dictionary -> JSON Data
                     let jsonData = try JSONSerialization.data(
                         withJSONObject: configDict,
                         options: []
                     )
-                    
-    
-                    let apiResponse =  try JSONDecoder().decode(GoPlayApiResponse<TokenData>.self, from: jsonData)
-                    
+
+                    let apiResponse = try JSONDecoder().decode(
+                        GoPlayApiResponse<TokenData>.self,
+                        from: jsonData
+                    )
+
                     var message = "Lỗi đăng nhập"
-                    
-                    print("checkDevice apiResponse",apiResponse)
+
+                    print("checkDevice apiResponse", apiResponse)
                     if apiResponse.isSuccess() {
                         print("checkDevice isSuccess true")
-                        self.logEvent("login_success", ["SUCCESS":"SUCCESS"])
-                        if(apiResponse.data != nil){
-                            let tokenData : TokenData = apiResponse.data!
-                            if let session = GoPlaySession.deserialize(data: tokenData) {
-                                print("checkDevice get session =",session)
-                                KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
-                                AuthManager.shared.postEventLogin(sesion: session)
+                        self.logEvent("login_success", ["SUCCESS": "SUCCESS"])
+                        if apiResponse.data != nil {
+                            let tokenData: TokenData = apiResponse.data!
+                            if let session = GoPlaySession.deserialize(
+                                data: tokenData
+                            ) {
+                                //                                print("checkDevice get session =",session)
+                                KeychainHelper.save(
+                                    key: GoConstants.goPlaySession,
+                                    data: session
+                                )
+                                AuthManager.shared.postEventLogin(
+                                    session: session,
+                                    errorStr: nil
+                                )
                                 return
-                            }else{
+                            } else {
                                 //AlertDialog.instance.show(message:"Không đọc được Token")
                             }
                         }
-                        
-                        
-                        
+
+                    }else {
+                        AuthManager.shared.postEventResResult(
+                            resCode:apiResponse.code,
+                            error: apiResponse.message
+                        )
                     }
-                    
+
                 } catch {
                     print("❌ Failed to decode data in checkDevice:", error)
                 }
-                
+
                 self.showLoginForm()
-                
+
             },
             failure: { (error: Error) in
-                print("❌ checkDevice request Failed:", error.localizedDescription)
+                print(
+                    "❌ checkDevice request Failed:",
+                    error.localizedDescription
+                )
                 self._isGetConfig = true
-                if self.autoLogin || self.isManualClick {
-                    self.savedUserServer()
-                }
+                
             }
         )
     }
-    
-    func showLoginForm() {
-        KeychainHelper.clearSavedData()
-        AuthManager.shared.postEventLogin(sesion: nil)
+
+    @objc func showLoginForm() {
+//        KeychainHelper.clearSavedData()
+//        AuthManager.shared.postEventLogin(session: nil)
     }
-    
+
+    @objc public func logOut() {
+        //logout google,apple,fb,goId
+        GoogleSignInManager.shared.logOut()
+        SignInWithAppleDelegates.shared.logOut()
+        GoApiService.shared.logOut(
+            success: { (configDict: [String: Any]) in
+                print("logOut done :", configDict)
+
+                do {
+                    let jsonData = try JSONSerialization.data(
+                        withJSONObject: configDict,
+                        options: []
+                    )
+
+                    let apiResponse = try JSONDecoder().decode(
+                        GoPlayApiResponse<TokenData>.self,
+                        from: jsonData
+                    )
+
+                    var message = "Lỗi đăng xuất"
+
+                    print("logOut apiResponse", apiResponse)
+                    if apiResponse.isSuccess() {
+                        self.logEvent("logout_success", ["SUCCESS": "SUCCESS"])
+                        KeychainHelper.clearDatalogOut()
+                        AuthManager.shared.postEventLogout(
+                            error: nil
+                        )
+
+                    }
+
+                } catch {
+                    print("❌ Failed to logout, parse data error:", error)
+                    AuthManager.shared.postEventLogout(
+                        error: "error: Failed to logout, parse data  \(error.localizedDescription)"
+                    )
+                }
+
+
+            },
+            failure: { (error: Error) in
+                print(
+                    "❌ fail to reqeust api logout",
+                    error.localizedDescription
+                )
+                AuthManager.shared.postEventLogout(
+                    error: error.localizedDescription ?? "Đăng xuất thất bại"
+                )
+            }
+        )
+    }
+
+    @objc public func startObservingLoginResultForTarget(
+        goPlayAction: NSString,
+        target: NSObject,
+        selector: Selector
+    ) {
+        GenericObserver.shared.startObservingLoginResultForTarget(
+            goPlayAction: goPlayAction,
+            target: target,
+            selector: selector
+        )
+    }
+
+    @objc public func cancelObserver(goPlayAction: NSString) {
+        GenericObserver.shared.cancelObserver(goPlayAction: goPlayAction)
+    }
+
+    @objc public func cancelAllObservers() {
+        GenericObserver.shared.cancelAll()
+    }
+
 }

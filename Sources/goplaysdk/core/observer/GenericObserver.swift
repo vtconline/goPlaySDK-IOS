@@ -1,50 +1,38 @@
-//
-//  GenericObserver.swift
-//  goplaysdk
-//
-//  Created by Ngô Đồng on 17/4/25.
-//
-
 import Combine
 import Foundation
 
 // Conforming to Sendable if needed (for concurrency)
 @MainActor
-public class GenericObserver{
-//    private var cancellables: [ObjectIdentifier: AnyCancellable] = [:]  // Dictionary to track subscriptions
+@objc public class GenericObserver: NSObject {
+    // Dictionary to track subscriptions
     private var cancellables: [AnyHashable: AnyCancellable] = [:]
-    let loginResultPublisher = PassthroughSubject<LoginResult, Never>()
-
+    private let lock = NSLock()
+//    let loginResultPublisher = PassthroughSubject<LoginResultObjC, Never>()
 
     // Singleton instance
-    public static let shared = GenericObserver()
+    @objc public static let shared = GenericObserver()
 
     // Private initializer to enforce Singleton usage
-    private init() {}
+    private override init() {}
 
     // Function to observe changes to the entire data of a GoPlayViewModel
-    public func observe<T>(viewModel: GoPlayViewModel<T>, onChange: @escaping (T) async-> Void) {
-        
+    public func observe<T>(
+        viewModel: GoPlayViewModel<T>,
+        onChange: @escaping (T) async -> Void
+    ) {
+
         let cancellable = viewModel.$data
-//            .sink(receiveValue: onChange)
+            //            .sink(receiveValue: onChange)
+//            .receive(on: RunLoop.main)
             .sink { value in
-                            // Since it's async, call it with await inside a Task
-                            Task {
-                                await onChange(value)
-                            }
-                        }
+                // Since it's async, call it with await inside a Task
+                Task {
+                    await onChange(value)
+                }
+            }
 
-
-//        let id = ObjectIdentifier(viewModel)
-//        cancellables[id] = cancellable
-        // Synchronize access to cancellables dictionary
-//        lock.sync {
-//            let id = ObjectIdentifier(viewModel)
-//            cancellables[id] = cancellable
-//        }
-        
     }
-    
+
     public func observeProperty<T, U>(
         viewModel: GoPlayViewModel<T>,
         keyPath: KeyPath<T, U>,
@@ -56,58 +44,90 @@ public class GenericObserver{
 
         let id = ObjectIdentifier(viewModel)
         cancellables[id] = cancellable
-//        lock.sync {
-//            let id = ObjectIdentifier(viewModel)
-//            cancellables[id] = cancellable
-//        }
-        
-    }
-    /* must manual-canceled subscription when not use*/
-    public func observePublisher<T>(
-            publisher: AnyPublisher<T, Never>,
-            id: AnyHashable,
-            onChange: @escaping (T) -> Void
-        ) {
-            let cancellable = publisher
-                .sink(receiveValue: onChange)
 
-            cancellables[ObjectIdentifierWrapper(id)] = cancellable
-        }
+    }
+    /*
+     must manual-canceled subscription when not use
+     Swift usage only: generic observer (cannot be @objc)
+     */
+    public func observePublisher<T>(
+        publisher: AnyPublisher<T, Never>,
+        id: AnyHashable,
+        onChange: @escaping (T) -> Void
+    ) {
+
+        let cancellable =
+            publisher
+            .receive(on: RunLoop.main)
+            .sink(receiveValue: onChange)
+        lock.lock()
+        cancellables[ObjectIdentifierWrapper(id)] = cancellable
+        lock.unlock()
+    }
     /* Auto-canceled subscription  after get data 1st time*/
     public func observePublisherOnce<T>(
-            publisher: AnyPublisher<T, Never>,
-            id: AnyHashable,
-            onChange: @escaping (T) -> Void
-        ) {
-            var cancellable: AnyCancellable? = nil
-            
-            cancellable = publisher.sink { [weak self] value in
-                onChange(value)
-                
-                // Cancel and remove after first event
-                if let self = self, let cancellable = cancellable {
-                    self.cancellables[id]?.cancel()
-                    self.cancellables.removeValue(forKey: id)
-                    //print("Auto-canceled subscription for \(id)")
-                }
-            }
-            
-            if let cancellable = cancellable {
-                cancellables[id] = cancellable
+        publisher: AnyPublisher<T, Never>,
+        id: AnyHashable,
+        onChange: @escaping (T) -> Void
+    ) {
+        var cancellable: AnyCancellable? = nil
+
+        cancellable = publisher.receive(on: RunLoop.main).sink { [weak self] value in
+            onChange(value)
+
+            // Cancel and remove after first event
+            if let self = self, let cancellable = cancellable {
+                self.cancellables[id]?.cancel()
+                self.cancellables.removeValue(forKey: id)
+                //print("Auto-canceled subscription for \(id)")
             }
         }
-    
-    
 
+        if let cancellable = cancellable {
+            lock.lock()
+            cancellables[id] = cancellable
+            lock.unlock()
+        }
+    }
 
-    // Function to observe a specific property of GoPlayViewModel using KeyPath
-//    func observeProperty<T, U>(viewModel: GoPlayViewModel<T>, keyPath: KeyPath<T, U>, onChange: @escaping (U) -> Void) {
-//        let cancellable = viewModel.publisher(for: keyPath)
-//            .sink(receiveValue: onChange)
-//
-//        let id = ObjectIdentifier(viewModel)
-//        cancellables[id] = cancellable
-//    }
+    // ObjC-compatible method: observe LoginResult
+    @objc public func startObservingLoginResultForTarget(
+        goPlayAction: NSString,
+        target: NSObject,
+        selector: Selector
+    ) {
+        guard let publisher = resolvePublisher(for: goPlayAction as String)
+        else {
+            print("⚠️ Không tìm thấy publisher cho action: \(goPlayAction)")
+            return
+        }
+        let cancellable =
+            publisher
+            .receive(on: RunLoop.main)
+            .sink { [weak target] result in
+//                print("✅ ==== Đã nhận được login result: \(result)")
+
+                guard let target = target else { return }
+
+                if target.responds(to: selector) {
+                    _ = target.perform(selector, with: result)
+                } else {
+//                    print("❌ Không phản hồi selector: \(selector)")
+                }
+            }
+
+        lock.lock()
+        cancellables[goPlayAction] = cancellable
+        lock.unlock()
+    }
+
+    // Optional: cancel observer by id
+    @objc public func cancelObserver(goPlayAction: NSString) {
+        lock.lock()
+        cancellables[goPlayAction]?.cancel()
+        cancellables.removeValue(forKey: goPlayAction)
+        lock.unlock()
+    }
 
     // Function to cancel subscription for a specific ViewModel
     public func cancelSubscription<T>(for viewModel: GoPlayViewModel<T>?) {
@@ -116,39 +136,56 @@ public class GenericObserver{
         cancellables[id]?.cancel()  // Cancel the subscription for the specific ViewModel
         cancellables.removeValue(forKey: id)  // Remove the cancellable from the dictionary
         print("Subscription canceled for \(viewModel)")
-//        lock.sync {
-//            cancellables[id]?.cancel()  // Cancel the subscription for the specific ViewModel
-//            cancellables.removeValue(forKey: id)  // Remove the cancellable from the dictionary
-//            print("Subscription canceled for \(viewModel)")
-//        }
-        
+
     }
-    
-    public func cancelSubscriptionByID(for id: AnyHashable) {
-            cancellables[id]?.cancel()
-            cancellables.removeValue(forKey: id)
-            print("Subscription canceled for \(id)")
-        }
+
+    @objc public func cancelSubscriptionByID(for id: AnyHashable) {
+        cancellables[id]?.cancel()
+        cancellables.removeValue(forKey: id)
+        print("Subscription canceled for \(id)")
+    }
 
     // Function to cancel all subscriptions
-    public func cancelAll() {
+    @objc public func cancelAll() {
         cancellables.forEach { $0.value.cancel() }  // Cancel all subscriptions
         cancellables.removeAll()  // Remove all entries from the dictionary
         print("All subscriptions canceled.")
-//        lock.sync {
-//            cancellables.forEach { $0.value.cancel() }  // Cancel all subscriptions
-//            cancellables.removeAll()  // Remove all entries from the dictionary
-//            print("All subscriptions canceled.")
-//        }
-        
+
     }
-    
+
     // Helper to make AnyHashable act like ObjectIdentifier
     private struct ObjectIdentifierWrapper: Hashable {
         let id: AnyHashable
 
         init(_ id: AnyHashable) {
             self.id = id
+        }
+    }
+
+    private func resolvePublisher(for action: String) -> AnyPublisher<
+        AnyObject, Never
+    >? {
+        switch action {
+        case GoPlayAction.loginResult:
+            return AuthManager.shared.loginResultPublisher
+                .map { $0 as AnyObject }
+                .eraseToAnyPublisher()
+        case GoPlayAction.logoutResult:
+            return AuthManager.shared.logoutResultPublisher
+                .map { $0 as AnyObject }
+                .eraseToAnyPublisher()
+        case GoPlayAction.openUpdateProfile:
+            return AuthManager.shared.updateProfilePublisher
+                .map { $0 as AnyObject }
+                .eraseToAnyPublisher()
+        case GoPlayAction.tokenExpire:
+            return AuthManager.shared.resResultPublisher
+                .map { $0 as AnyObject }
+                .eraseToAnyPublisher()
+
+        default:
+            print("resolvePublisher:: must return != nil if want event get fire!!!")
+            return nil
         }
     }
 }
@@ -169,7 +206,6 @@ public class GenericObserver{
      }
  }
  */
-
 
 /* USAGE: example
  struct Person {
@@ -197,6 +233,3 @@ public class GenericObserver{
  // Person's name changed to: Alice
 
  */
-
-
-

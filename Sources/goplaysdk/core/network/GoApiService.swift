@@ -77,12 +77,16 @@ public class GoApiService {
             }
         }
     }
-    //checkDevice
     
     public func checkDevice(success: @escaping ([String: Any]) -> Void, failure: @escaping (_ error : Error) -> Void) {
         
         var refreshToken: String? = KeychainHelper.loadCurrentSession()?.refreshToken ?? "";
         print("checkDevice with refreshToken: \(refreshToken ?? "") ")
+        if(refreshToken == nil  || refreshToken == "" ){
+            let error = NSError(domain: "CheckDevice", code: -1, userInfo: [NSLocalizedDescriptionKey: "refreshToken sent is empty"])
+            failure(error)
+            return;
+        }
         var params = GoApiService.shared.getuserParams(refreshToken)
         LoadingDialog.instance.show()
         
@@ -111,6 +115,50 @@ public class GoApiService {
                         success(responseDict)
                     } catch {
                         print("❌ checkDevice Failed to parse JSON:", error)
+                    }
+
+                case .failure(let error):
+                    // Handle failure response
+                    // print("Error: \(error.localizedDescription)")
+//                    AlertDialog.instance.show(
+//                        message: error.localizedDescription
+//                    )
+                    failure(error)
+                }
+            }
+        }
+    }
+    
+    public func logOut(success: @escaping ([String: Any]) -> Void, failure: @escaping (_ error : Error) -> Void) {
+    
+        var params = GoApiService.shared.getuserParams("")
+        LoadingDialog.instance.show()
+        
+    
+        Task {
+            await ApiService.shared.post(
+                path: GoApi.oauthLogout,
+                body: params,
+                sign: false
+            ) { result in
+
+                LoadingDialog.instance.hide()
+
+                switch result {
+                case .success(let data):
+                    // Handle successful response
+
+                    // Parse the response if necessary
+                    do {
+                        let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                        guard let responseDict = jsonResponse as? [String: Any] else {
+                            print("❌ logOut JSON is not a dictionary")
+                            return
+                        }
+                        print("✅ logOut Parsed Response:", responseDict)
+                        success(responseDict)
+                    } catch {
+                        print("❌ logOut Failed to parse JSON:", error)
                     }
 
                 case .failure(let error):

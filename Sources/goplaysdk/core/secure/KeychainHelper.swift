@@ -98,7 +98,20 @@ class KeychainHelper {
         }
         
         // Clear GoPlaySession from Keychain
-        KeychainHelper.remove(key: "GoPlaySession")
+        KeychainHelper.remove(key: GoConstants.goPlaySession)
+    }
+    
+    static func clearDatalogOut() {
+        // Clear username from UserDefaults
+//        UserDefaults.standard.removeObject(forKey: "savedUsername")
+//        
+//        // Clear password from Keychain
+//        if let _ = KeychainHelper.load(key: "savedPassword", type: String.self) {
+//            KeychainHelper.remove(key: "savedPassword")
+//        }
+        
+        // Clear GoPlaySession from Keychain
+        KeychainHelper.remove(key: GoConstants.goPlaySession)
     }
 
     // MARK: - Private Methods

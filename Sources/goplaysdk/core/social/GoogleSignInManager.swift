@@ -6,7 +6,7 @@ import GoogleSignIn
 public class GoogleSignInManager {
     public static let shared = GoogleSignInManager()
 
-    public func signOut() {
+    public func logOut() {
         GIDSignIn.sharedInstance.signOut()
     }
     

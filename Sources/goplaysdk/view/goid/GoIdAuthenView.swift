@@ -190,7 +190,7 @@ public struct GoIdAuthenView: View {
                     let tokenData : TokenData = apiResponse.data!
                     if let session = GoPlaySession.deserialize(data: tokenData) {
                         KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
-                        AuthManager.shared.postEventLogin(sesion: session)
+                        AuthManager.shared.postEventLogin(session: session, errorStr: nil)
                     }else{
                         AlertDialog.instance.show(message:"Không đọc được Token")
                     }

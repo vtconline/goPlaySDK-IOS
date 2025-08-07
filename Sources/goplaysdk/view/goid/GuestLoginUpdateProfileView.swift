@@ -195,7 +195,7 @@ public struct GuestLoginUpdateProfileView: View {
                         data: session
                     )
                     AuthManager.shared.postEventProfile(
-                        sesion: session,
+                        session: session,
                         error: nil
                     )
                 } else {
