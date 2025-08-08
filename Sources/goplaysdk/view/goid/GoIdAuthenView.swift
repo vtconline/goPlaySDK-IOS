@@ -54,10 +54,10 @@ public struct GoIdAuthenView: View {
                     300
                 ), alignment: .center)
                 .onChange(of: rememberMe) { newValue in
-                            print("✅ rememberMe: \(newValue ? "On" : "Off")")
-                            // 👉 Gọi callback tại đây
+                            //print("✅ rememberMe: \(newValue ? "On" : "Off")")
+                    UserDefaults.standard.set(rememberMe, forKey: GoConstants.rememberMe)
                             if(!newValue){
-                                KeychainHelper.remove(key: "savedPassword")
+                                KeychainHelper.remove(key: GoConstants.savedPassword)
                             }
                         }
             
@@ -94,13 +94,20 @@ public struct GoIdAuthenView: View {
         }
         .padding()
         .onAppear {
-            if let savedUsername = UserDefaults.standard.string(forKey: "savedUsername") {
-                username = savedUsername
+            let saveRememberMe = UserDefaults.standard.bool(forKey: GoConstants.rememberMe)
+            rememberMe = saveRememberMe
+            if(saveRememberMe){
+                if let savedUsername = UserDefaults.standard.string(forKey: GoConstants.savedUserName) {
+                    username = savedUsername
+                }
+                if let pwdData = KeychainHelper.load(key: GoConstants.savedPassword),
+                   let pwd = String(data: pwdData, encoding: .utf8) {
+                    password = pwd
+                }
             }
-            if let pwdData = KeychainHelper.load(key: "savedPassword"),
-               let pwd = String(data: pwdData, encoding: .utf8) {
-                password = pwd
-            }
+            
+            
+            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top) //topLeading
         .background(Color.white)
@@ -132,12 +139,12 @@ public struct GoIdAuthenView: View {
             return
         }
         if rememberMe {
-            UserDefaults.standard.set(username, forKey: "savedUsername")
+            UserDefaults.standard.set(username, forKey: GoConstants.savedUserName)
             if let pwdData = password.data(using: .utf8) {
-                KeychainHelper.save(key: "savedPassword", data: pwdData)
+                KeychainHelper.save(key: GoConstants.savedPassword, data: pwdData)
             }
         } else {
-            KeychainHelper.remove(key: "savedPassword")
+            KeychainHelper.remove(key: GoConstants.savedPassword)
         }
 //                guard !phoneNumber.isEmpty, !otp.isEmpty else {
 //                    alertMessage = "Vui lòng nhập SĐT và otp"
