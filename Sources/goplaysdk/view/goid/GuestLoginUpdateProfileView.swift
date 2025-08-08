@@ -40,7 +40,7 @@ public struct GuestLoginUpdateProfileView: View {
                 placeholder: "Nhập tài khoản",
                 isPwd: false,
                 validator: userNameValidator,
-                leftIconName: "images/ic_user_focused",
+                leftIconName: "ic_user_focused",
                 isSystemIcon: false
             )
             .keyboardType(.phonePad)
@@ -51,17 +51,17 @@ public struct GuestLoginUpdateProfileView: View {
                 placeholder: "Nhập mật khẩu",
                 isPwd: true,
                 validator: passwordValidator,
-                leftIconName: "images/ic_lock_focused",
+                leftIconName: "ic_lock_focused",
                 isSystemIcon: false
             )
             .keyboardType(.phonePad)
             .padding(.horizontal, 16)
 
-            /*GoTextField<PhoneValidator>(text: $phoneNumber, placeholder: "Số ĐT", isPwd: false, validator: phoneNumberValidator, leftIconName: "images/ic_phone", isSystemIcon: false)
+            /*GoTextField<PhoneValidator>(text: $phoneNumber, placeholder: "Số ĐT", isPwd: false, validator: phoneNumberValidator, leftIconName: "ic_phone", isSystemIcon: false)
                 .keyboardType(.phonePad)
                 .padding(.horizontal, 16)
             
-            GoTextField<EmailValidator>(text: $email, placeholder: "Email", isPwd: false, validator: emailValidator, leftIconName: "images/ic_email", isSystemIcon: false)
+            GoTextField<EmailValidator>(text: $email, placeholder: "Email", isPwd: false, validator: emailValidator, leftIconName: "ic_email", isSystemIcon: false)
                 .keyboardType(.phonePad)
                 .padding(.horizontal, 16)
              */

@@ -39,7 +39,7 @@ let package = Package(
                         ],
 //           path: "Sources/goplaysdk", // This is where your views will go
             resources: [
-                            .process("../images") // ✅ Add your image folder here
+                            .process("images") // ✅ Add your image folder here
                         ]
         ),
         .testTarget(

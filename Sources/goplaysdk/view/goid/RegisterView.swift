@@ -28,7 +28,7 @@ public struct RegisterView: View {
 
             GoTextField<UsernameValidator>(
                 text: $userName, placeholder: "Nhập tài khoản", isPwd: false,
-                validator: userNameValidator, leftIconName: "images/ic_user_focused",
+                validator: userNameValidator, leftIconName: "ic_user_focused",
                 isSystemIcon: false
             )
             .keyboardType(.default)
@@ -36,7 +36,7 @@ public struct RegisterView: View {
 
             GoTextField<PasswordValidator>(
                 text: $passWord, placeholder: "Nhập mật khẩu", isPwd: true,
-                validator: passwordValidator, leftIconName: "images/ic_lock_focused",
+                validator: passwordValidator, leftIconName: "ic_lock_focused",
                 isSystemIcon: false
             )
             .keyboardType(.default)
@@ -44,14 +44,14 @@ public struct RegisterView: View {
 
             GoTextField<PhoneValidator>(
                 text: $phoneNumber, placeholder: "Số ĐT", isPwd: false,
-                validator: phoneNumberValidator, leftIconName: "images/ic_phone",
+                validator: phoneNumberValidator, leftIconName: "ic_phone",
                 isSystemIcon: false, keyboardType: .numberPad
             )
             .padding(.horizontal, 16)
 
             GoTextField<EmailValidator>(
                 text: $email, placeholder: "Email", isPwd: false, validator: emailValidator,
-                leftIconName: "images/ic_email", isSystemIcon: false, keyboardType: .emailAddress
+                leftIconName: "ic_email", isSystemIcon: false, keyboardType: .emailAddress
             )
 
             .padding(.horizontal, 16)
