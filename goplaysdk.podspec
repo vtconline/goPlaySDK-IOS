@@ -24,6 +24,8 @@ Written in Swift & SwiftUI.
 
   s.platform         = :ios, '15.0'
   s.swift_version    = '5.9'
+  s.static_framework = true
+
 
   s.source_files     = 'Sources/goplaysdk/**/*.swift'
   s.resources        = ['Sources/goplaysdk/images/**/*']
