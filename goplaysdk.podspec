@@ -19,52 +19,26 @@ Written in Swift & SwiftUI.
 
   s.source           = {
     :git => 'https://github.com/vtconline/goPlaySDK-IOS.git',
-    # :tag => s.version.to_s
-    :tag => "v1.0.15"
+    :tag => 'v1.0.15'
   }
 
   s.platform         = :ios, '15.0'
   s.swift_version    = '5.9'
 
-  s.ios.deployment_target = '12.0'
+  s.source_files     = 'Sources/goplaysdk/**/*.swift'
+  s.resources        = ['Sources/goplaysdk/images/**/*']
 
-  # s.pod_target_xcconfig = {
-  # 'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
-  # }
-
-  # s.user_target_xcconfig = {
-  #   'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
-  # }
-
-  # 📂 Source
-  s.source_files     = 'Sources/goplaysdk/**/*.{swift}'
-
-  # 🖼 Resources
-  # s.resource_bundles = {
-  #   'goplaysdk' => ['Sources/goplaysdk/images/**/*']
-  # }
-  s.resources    = ['Sources/goplaysdk/images/**/*']
-
-
-  # 🧩 System Frameworks
   s.frameworks = [
     'UIKit',
     'SwiftUI',
     'AuthenticationServices'
   ]
 
-  # ===== DEPENDENCIES =====  
-  # Google Sign-In (từ v7.0.0)  
-  s.dependency 'GoogleSignIn', '~> 7.0'    
-  # Facebook SDK (chính xác v14.1.0)  
-  s.dependency 'FBSDKLoginKit'
-  s.dependency 'FBSDKCoreKit'
-  # Firebase (chính xác v12.1.0)  
-s.dependency 'Firebase/Analytics', '~> 10.0'
-s.dependency 'Firebase/Crashlytics', '~> 10.0'
-  # Thêm các Firebase modules khác nếu cần: 
-  # s.dependency 'Firebase/Firestore', '12.1.0'  
-  # s.dependency 'Firebase/Messaging', '12.1.0'    
-  # Swift-JWT (từ v4.0.2)  
+  # Dependencies
+  s.dependency 'GoogleSignIn', '~> 7.0'
+  s.dependency 'FBSDKLoginKit', '~> 16.0'
+  s.dependency 'FBSDKCoreKit',  '~> 16.0'
+  s.dependency 'Firebase/Analytics', '~> 10.0'
+  s.dependency 'Firebase/Crashlytics', '~> 10.0'
   s.dependency 'SwiftJWT'
 end
