@@ -27,11 +27,11 @@ Written in Swift & SwiftUI.
   s.swift_version    = '5.9'
 
   s.pod_target_xcconfig = {
-  'IPHONEOS_DEPLOYMENT_TARGET' => '12.0'
+  'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
   }
 
   s.user_target_xcconfig = {
-    'IPHONEOS_DEPLOYMENT_TARGET' => '12.0'
+    'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
   }
 
   # 📂 Source
