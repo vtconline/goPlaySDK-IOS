@@ -26,6 +26,14 @@ Written in Swift & SwiftUI.
   s.platform         = :ios, '15.0'
   s.swift_version    = '5.9'
 
+  s.pod_target_xcconfig = {
+  'IPHONEOS_DEPLOYMENT_TARGET' => '12.0'
+  }
+
+  s.user_target_xcconfig = {
+    'IPHONEOS_DEPLOYMENT_TARGET' => '12.0'
+  }
+
   # 📂 Source
   s.source_files     = 'Sources/goplaysdk/**/*.{swift}'
 
