@@ -61,7 +61,8 @@ Written in Swift & SwiftUI.
   s.dependency 'FBSDKCoreKit', '14.1.0'    
   # Firebase (chính xác v12.1.0)  
   s.dependency 'Firebase/Analytics', '12.1.0'  
-  s.dependency 'Firebase/Auth', '12.1.0'  
+  s.dependency 'Firebase/Auth', '12.1.0' 
+  s.dependency 'Firebase/Crashlytics', '12.1.0' 
   # Thêm các Firebase modules khác nếu cần: 
   # s.dependency 'Firebase/Firestore', '12.1.0'  
   # s.dependency 'Firebase/Messaging', '12.1.0'    
