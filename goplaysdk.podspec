@@ -19,7 +19,8 @@ Written in Swift & SwiftUI.
 
   s.source           = {
     :git => 'https://github.com/vtconline/goPlaySDK-IOS.git',
-    :tag => s.version.to_s
+    # :tag => s.version.to_s
+    :tag => "v1.0.14"
   }
 
   s.platform         = :ios, '15.0'
