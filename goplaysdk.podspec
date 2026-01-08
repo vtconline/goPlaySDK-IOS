@@ -36,8 +36,8 @@ Written in Swift & SwiftUI.
     'AuthenticationServices'
   ]
 
-  # Dependencies
-  s.dependency 'GoogleSignIn', '~> 8.0'
+  # Dependencies pod search GoogleSignIn --simple. ==> find latest version in cdn, in web cocoapod may not correct with podspec publish
+  s.dependency 'GoogleSignInCommunity', '~> 9.0'
   s.dependency 'FBSDKLoginKit', '~> 16.0'
   s.dependency 'FBSDKCoreKit',  '~> 16.0'
   s.dependency 'Firebase/Analytics', '~> 11.12'
