@@ -5,7 +5,7 @@
 //  Created by Ngô Đồng on 24/4/25.
 //
 
-import SwiftUICore
+import SwiftUI
 
 
 

@@ -4,7 +4,6 @@
 
 import Foundation
 import UIKit
-import SwiftUICore
 import SwiftUI
 
 @MainActor
@@ -54,10 +53,12 @@ import SwiftUI
             view = AnyView(GoPlayPhoneLoginViewObjC())
         }
 
-        let controller = UIHostingController(rootView: view)
+        let controller = GoPlayHostingController(rootView: view)// UIHostingController(rootView: view)
         //ensure fullscreen
-        controller.modalPresentationStyle = .fullScreen
-//        hostingController = controller
+        controller.modalPresentationStyle = .pageSheet
+        
+        controller.rootView = AnyView(
+            view.environment(\.hostingController, controller))
         return controller
     }
 

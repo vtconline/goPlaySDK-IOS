@@ -118,3 +118,5 @@ xcuserdata
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,swiftpm,xcode,swiftpackagemanager
+ios-arm64.json
+ios-simulator.json

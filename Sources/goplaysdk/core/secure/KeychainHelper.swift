@@ -51,6 +51,15 @@ class KeychainHelper {
 //        print("Loaded GoPlaySession: \(loadedSession)")
 //    }
     static func load<T: Codable>(key: String, type: T.Type) -> T? {
+        // 🚨 Guard primitive types
+            if isPrimitiveType(T.self) {
+//                assertionFailure(
+//                    "⚠️ KeychainHelper.loadObject<T>: " +
+//                    "\(T.self) là primitive type. " +
+//                    "Hãy dùng loadPrimitive thay vì load."
+//                )
+                return loadPrimitive(key: key, type: type)
+            }
         if let data = KeychainHelper.load(key: key) {
             do {
                 // Decode the data back to the expected type
@@ -68,23 +77,52 @@ class KeychainHelper {
 //    KeychainHelper.save(key: "username", string: "johnDoe")
 //    KeychainHelper.save(key: "userAge", int: 30)
 //    KeychainHelper.save(key: "isLoggedIn", bool: true)
-//    if let userName: String = KeychainHelper.load(key: "username", type: String.self) {
+//    if let userName: String = KeychainHelper.loadPrimitive(key: "username", type: String.self) {
 //        print("Loaded userName: \(userName)")
 //    }
-    static func load<T>(key: String, type: T.Type) -> T? {
-            if let data = KeychainHelper.load(key: key) {
-                if T.self == String.self {
-                    return String(data: data, encoding: .utf8) as? T
-                } else if T.self == Int.self {
-                    return data.toInt() as? T
-                } else if T.self == Bool.self {
-                    return data.toBool() as? T
-                } else {
-                    return nil
-                }
-            }
+    static func loadPrimitive<T>(key: String, type: T.Type) -> T? {
+        guard let data = KeychainHelper.load(key: key) else { return nil }
+
+        switch T.self {
+        case is String.Type:
+            return String(decoding: data, as: UTF8.self) as? T
+
+        case is Bool.Type:
+            return (data.first == 1) as? T
+
+        case is Int.Type:
+            return data.toInt() as? T
+
+        case is Int64.Type:
+            return data.toInt64() as? T
+
+        case is Float.Type:
+            return data.toFloat() as? T
+
+        case is Double.Type:
+            return data.toDouble() as? T
+
+        default:
+            assertionFailure(
+                "⚠️ KeychainHelper.loadPrimitive: Unsupported primitive type \(T.self)"
+            )
             return nil
         }
+    }
+
+    
+    private static func isPrimitiveType(_ type: Any.Type) -> Bool {
+        switch type {
+        case is String.Type,
+             is Bool.Type,
+             is Int.Type,
+             is Double.Type,
+             is Float.Type:
+            return true
+        default:
+            return false
+        }
+    }
 
 
     
@@ -171,12 +209,23 @@ extension Data {
     }
     
     // Helper to convert Data back to Int
-    func toInt() -> Int? {
-        return self.withUnsafeBytes { $0.load(as: Int.self) }
+    func toInt() -> Int {
+        withUnsafeBytes { $0.load(as: Int.self) }
     }
-    
-    // Helper to convert Data back to Bool
-    func toBool() -> Bool? {
-        return self.withUnsafeBytes { $0.load(as: Bool.self) }
+
+    func toInt64() -> Int64 {
+        withUnsafeBytes { $0.load(as: Int64.self) }
+    }
+
+    func toFloat() -> Float {
+        withUnsafeBytes { $0.load(as: Float.self) }
+    }
+
+    func toDouble() -> Double {
+        withUnsafeBytes { $0.load(as: Double.self) }
+    }
+
+    func toBool() -> Bool {
+        first == 1
     }
 }

@@ -3,6 +3,7 @@ import SwiftUI
 public struct GuestLoginUpdateProfileView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.hostingController) private var hostingController
 
     private let onBack: () -> Void
 
@@ -110,13 +111,23 @@ public struct GuestLoginUpdateProfileView: View {
         LoadingDialog.instance.show()
 
         // This would be a sample data payload to send in the POST request
+        //ios
+//    apple login swift sample dev    goId: Ma xac thuc cua ban la: 298604, MKC2 cua ban la: 124A2805. MKC2 chi co tac dung sau khi xac thuc.
         var bodyData: [String: Any] = [
-            "oldAccountName": KeychainHelper.loadCurrentSession()?.userName
-                ?? "",
-            "newAccountName": userName,
-            "password": passWord,
-            "passwordmd5": Utils.md5(passWord),
+//            "oldAccountName": KeychainHelper.loadCurrentSession()?.userName
+//                ?? "",
+//            "newAccountName": userName,
+//            "password": passWord,
+//            "passwordmd5": Utils.md5(passWord),
+            "otp": passWord,
+//            "jwt":KeychainHelper.loadCurrentSession()?.accessToken
         ]
+        //test
+        var params222 = GoApiService.shared.getuserParams(nil)
+        bodyData = bodyData.merging(params222 ?? [:]) { current, _ in current }
+        //test
+        
+        
         var bodyMerge = Utils.getPartnerParams()
         bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
 
@@ -131,7 +142,7 @@ public struct GuestLoginUpdateProfileView: View {
         print("oApi.userRename params \(bodyData)")
         Task {
             await ApiService.shared.post(
-                path: GoApi.userRename,
+                path: GoApi.verifyPhone,//GoApi.verifyPhone GoApi.userRename
                 body: bodyData,
                 sign: false
             ) { result in
@@ -151,6 +162,7 @@ public struct GuestLoginUpdateProfileView: View {
                     {
                         print("requestUpdate Response: \(responseDict)")
                         onUpdateInfoResponse(response: responseDict)
+                        hostingController?.close()
                     }
 
                 case .failure(let error):

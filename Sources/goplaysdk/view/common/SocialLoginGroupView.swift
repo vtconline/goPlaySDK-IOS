@@ -1,9 +1,11 @@
 import AuthenticationServices
 import SwiftUI
 
-//0394253555
+
 public struct SocialLoginGroupView: View {
     @State private var authorizationController: ASAuthorizationController?
+    //hostingController được truyền xuyên suốt cây view từ rootView(goplaysdk.getGoPlayView) -> các subview => access every where in sub child/view
+    @Environment(\.hostingController) private var hostingController
 
     private var haveGoIdLogin: Bool = false
     public init(haveGoIdLogin: Bool) {
@@ -99,10 +101,24 @@ public struct SocialLoginGroupView: View {
                 action: loginWithGmail
             )
 
-            CustomAppleSignInButton(
-                title: "",
+//            CustomAppleSignInButton(
+//                title: "",
+//                width: 60,
+//                action: loginWithApple
+//            )
+            
+            GoButton(
+                text: "",
+                color: AppTheme.Colors.apple,
+                textColor: .white,
+                iconSysColor: .white,
+                width: 60,
+                iconName: "apple.logo",
+                iconPadding: EdgeInsets(top: 0, leading: 0, bottom: 6, trailing: 0),
+                
                 action: loginWithApple
             )
+            
             GoButton(
                 color: .white,
                 borderColor: .black,
@@ -173,10 +189,11 @@ public struct SocialLoginGroupView: View {
     private func loginWithGmail() {
         GoogleSignInManager.shared.signIn { user, error in
             if let error = error {
+                print("loginWithGmail error: \(error)")
                 AlertDialog.instance.show(message: error.localizedDescription)
             } else if let user = user {
                 //userName = user.profile.name
-                //                print("user.serverAuthCode \(user.serverAuthCode)")
+                print("loginWithGmail user.serverAuthCode \(user.serverAuthCode)")
                 if let profile = user.user.profile, profile != nil {
                     let idToken = user.user.idToken?.tokenString ?? ""
 
@@ -198,13 +215,13 @@ public struct SocialLoginGroupView: View {
         var bodyData: [String: Any] = [
             "ggId": gId,
             "ggEmail": gMail,
-            //            "ggName": "",
             "code": authenCode,  //old sdk
                 //            "token": token,//new sdk
         ]
         if name != nil {
             bodyData["ggName"] = name
         }
+        print("requestLoginWithGoogle bodyData: \(bodyData)")
 
         Task {
             await ApiService.shared.post(path: GoApi.oauthGoogle, body: bodyData) { result in
@@ -362,6 +379,7 @@ public struct SocialLoginGroupView: View {
                     if let session = GoPlaySession.deserialize(data: tokenData) {
                         KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
                         AuthManager.shared.postEventLogin(session: session, errorStr: nil)
+                        hostingController?.close() // close rootview(which add hostingController in gopalysdk.getGoPlayView)
                     } else {
                         AlertDialog.instance.show(message: "Không đọc được Token")
                     }

@@ -22,6 +22,7 @@ public class GoogleSignInManager {
         topViewController { topVC in
             guard let topVC = topVC else { return }
             // https://console.cloud.google.com/apis/credentials?inv=1&invt=Ab4wnA&project=goidauthen
+            // find oauth goplay vn
             //webClientID phải có thì mới trả về authenCode
             // if let infoDict = Bundle.main.infoDictionary,let clientID = infoDict["GIDClientID"] as? String {
             //     print("✅ GIDClientID tồn tại: \(clientID)")
@@ -34,7 +35,9 @@ public class GoogleSignInManager {
                 return
             }
 
-            //            let iosClientID = "968111791801-6f22l6stb4g3ru8ar7r82j8ddrq49r97.apps.googleusercontent.com"
+            //goIDaUTHEN project google
+//            let iosClientID = "907722388702-23a71q66g43sb1drjsv63s1tst7tn3h5.apps.googleusercontent.com";
+//            let iosClientID = "968111791801-pl6730rk2qetiidou6030tt3j4tedi1p.apps.googleusercontent.com"; //swiftobjCSample
             let iosClientID =
                 Bundle.main.infoDictionary?["GIDClientID"] as? String
                 ?? "968111791801-6f22l6stb4g3ru8ar7r82j8ddrq49r97.apps.googleusercontent.com"
@@ -42,6 +45,10 @@ public class GoogleSignInManager {
             let webClientID =
                 GoPlaySDK.instance.goPlayConfig?.googleClientId
                 ?? "968111791801-up5hvsuofg6o1e3n9m4ue1uqa258on3k.apps.googleusercontent.com"
+            //goIDaUTHEN web client
+//            let webClientID =
+//            "968111791801-up5hvsuofg6o1e3n9m4ue1uqa258on3k.apps.googleusercontent.com"
+//            let webClientID = "907722388702-thmj3tj357778b93li18shsnh64l1rf7.apps.googleusercontent.com"
 
             let config = GIDConfiguration(clientID: iosClientID, serverClientID: webClientID)
             GIDSignIn.sharedInstance.configuration = config

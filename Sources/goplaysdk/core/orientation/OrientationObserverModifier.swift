@@ -1,6 +1,6 @@
 /* add .observeOrientation() to any view for observer*/
 
-import SwiftUICore
+import SwiftUI
 import UIKit
 struct OrientationObserverModifier: ViewModifier {
     func body(content: Content) -> some View {

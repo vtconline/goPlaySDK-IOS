@@ -2,7 +2,8 @@ import SwiftUI
 
 public struct GoIdAuthenView: View {
     @Environment(\.dismiss) var dismiss
-    //    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.hostingController) private var hostingController
+
     @StateObject private var navigationManager = NavigationManager()
 
     @State private var username = ""  // Store the username
@@ -26,7 +27,7 @@ public struct GoIdAuthenView: View {
 
     public var body: some View {
         VStack(alignment: .center, spacing: spaceOriented) {
-
+            
             GoTextField<UsernameValidator>(
                 text: $username, placeholder: "Tên đăng nhập", isPwd: false,
                 validator: usernameValidator, leftIconName: "ic_user_focused",  // This should be the name of your image in Resources/Images
@@ -47,7 +48,7 @@ public struct GoIdAuthenView: View {
             .keyboardType(.default)
             //KeychainHelper.remove(key: "savedPassword")
             Toggle("Ghi nhớ đăng nhập", isOn: $rememberMe)
-                //                .padding(.horizontal, 32)
+                .foregroundColor(Color.black)
                 .frame(
                     maxWidth: min(
                         UIScreen.main.bounds.width - 2 * AppTheme.Paddings.horizontal,
@@ -89,11 +90,12 @@ public struct GoIdAuthenView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .center)  // Center the buttons horizontally
+ 
             .padding(.top, spaceOriented)  // Space between login and buttons in row
             .padding(.bottom, spaceOriented)
 
             SocialLoginGroupView(haveGoIdLogin: false)
-
+            
         }
         .padding()
         .onAppear {
@@ -113,11 +115,13 @@ public struct GoIdAuthenView: View {
             }
 
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)  //topLeading
+//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)  //topLeading
+        .adaptiveVerticalAlignment()
         .background(Color.white)
         .observeOrientation()
         .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
         .navigationTitle("Đăng nhập GoID")
+//        .hideNavigationTitleWhenLandscape()
         //.navigationBarBackButtonHidden(false) // Show back button (default)
 
         .navigationBarBackButtonHidden(true)
@@ -125,6 +129,7 @@ public struct GoIdAuthenView: View {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
                     dismiss()
+                    
                 }) {
                     HStack {
                         Image(systemName: "chevron.left")
@@ -133,6 +138,7 @@ public struct GoIdAuthenView: View {
                 }
             }
         }
+        .dismissKeyboardOnInteraction()
     }
 
     private func submitLoginGoId() {
@@ -213,6 +219,7 @@ public struct GoIdAuthenView: View {
                     if let session = GoPlaySession.deserialize(data: tokenData) {
                         KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
                         AuthManager.shared.postEventLogin(session: session, errorStr: nil)
+                        hostingController?.close()
                     } else {
                         AlertDialog.instance.show(message: "Không đọc được Token")
                     }

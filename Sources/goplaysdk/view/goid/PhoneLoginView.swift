@@ -4,6 +4,7 @@ import SwiftUI
 public struct PhoneLoginView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
+    @Environment(\.hostingController) private var hostingController
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var navigationManager = NavigationManager()
 
@@ -122,6 +123,8 @@ public struct PhoneLoginView: View {
                 }
             }
         }
+        .background(Color.white)
+        .dismissKeyboardOnInteraction()
 
     }
 
@@ -337,6 +340,7 @@ public struct PhoneLoginView: View {
                     if let session = GoPlaySession.deserialize(data: tokenData) {
                         KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
                         AuthManager.shared.postEventLogin(session: session, errorStr: nil)
+                        hostingController?.close() // close this view
                     } else {
                         AlertDialog.instance.show(message: "Không đọc được Token")
                     }
