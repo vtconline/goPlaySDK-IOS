@@ -37,7 +37,7 @@ Written in Swift & SwiftUI.
   ]
 
   # Dependencies
-  s.dependency 'GoogleSignIn', '9.1.0'
+  s.dependency 'GoogleSignIn', '~> 9.0'
   s.dependency 'FBSDKLoginKit', '~> 16.0'
   s.dependency 'FBSDKCoreKit',  '~> 16.0'
   s.dependency 'Firebase/Analytics', '12.7.0'
