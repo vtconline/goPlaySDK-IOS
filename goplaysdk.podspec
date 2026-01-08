@@ -57,15 +57,14 @@ Written in Swift & SwiftUI.
   # Google Sign-In (từ v7.0.0)  
   s.dependency 'GoogleSignIn', '~> 7.0'    
   # Facebook SDK (chính xác v14.1.0)  
-  s.dependency 'FBSDKLoginKit', '14.1.0'  
-  s.dependency 'FBSDKCoreKit', '14.1.0'    
+  s.dependency 'FBSDKLoginKit'
+  s.dependency 'FBSDKCoreKit'
   # Firebase (chính xác v12.1.0)  
-  s.dependency 'Firebase/Analytics', '12.1.0'  
-  s.dependency 'Firebase/Auth', '12.1.0' 
-  s.dependency 'Firebase/Crashlytics', '12.1.0' 
+s.dependency 'Firebase/Analytics', '~> 10.0'
+s.dependency 'Firebase/Crashlytics', '~> 10.0'
   # Thêm các Firebase modules khác nếu cần: 
   # s.dependency 'Firebase/Firestore', '12.1.0'  
   # s.dependency 'Firebase/Messaging', '12.1.0'    
   # Swift-JWT (từ v4.0.2)  
-  s.dependency 'SwiftJWT', '~> 4.0'
+  s.dependency 'SwiftJWT'
 end
