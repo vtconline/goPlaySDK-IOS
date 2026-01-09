@@ -24,7 +24,11 @@ Written in Swift & SwiftUI.
 
   s.platform         = :ios, '15.0'
   s.swift_version    = '5.9'
-  s.static_framework = true
+  # s.static_framework = true
+
+  s.pod_target_xcconfig = {
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'
+  }
 
 
   s.source_files     = 'Sources/goplaysdk/**/*.swift'
