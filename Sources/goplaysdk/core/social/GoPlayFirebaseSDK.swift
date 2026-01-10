@@ -5,10 +5,11 @@
 //  Created by Pate Assistant on 05/08/2025.
 //
 
-import Foundation
-import FirebaseCore
 import FirebaseAnalytics
-import FirebaseCrashlytics
+import FirebaseCore
+import Foundation
+
+// import FirebaseCrashlytics
 
 @MainActor
 public final class GoPlayFirebaseSDK {
@@ -23,7 +24,8 @@ public final class GoPlayFirebaseSDK {
 
         if FirebaseApp.app() == nil {
             if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
-               let options = FirebaseOptions(contentsOfFile: path) {
+                let options = FirebaseOptions(contentsOfFile: path)
+            {
                 FirebaseApp.configure(options: options)
                 print("✅ [GoPlayFirebaseSDK] Firebase configured successfully.")
             } else {
@@ -38,7 +40,7 @@ public final class GoPlayFirebaseSDK {
     }
 
     public func recordError(_ error: Error) {
-        Crashlytics.crashlytics().record(error: error)
+        // Crashlytics.crashlytics().record(error: error)
         print("💥 [GoPlayFirebaseSDK] Error recorded: \(error.localizedDescription)")
     }
 }

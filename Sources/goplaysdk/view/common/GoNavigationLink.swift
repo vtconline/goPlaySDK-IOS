@@ -49,7 +49,7 @@ public struct GoNavigationLink<Destination: View>: View {
                         .frame(width: imageSize.width, height: imageSize.height)
                         .foregroundColor(textColor)
                 } else if let assetImageName = assetImageName,
-                          let image = UIImage(named: assetImageName, in: Bundle.module, compatibleWith: nil) {
+                          let image = UIImage(named: assetImageName, in: Bundle.goplaysdk, compatibleWith: nil) {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFit()

@@ -58,7 +58,7 @@ struct GoTextField<Validator: TextFieldValidator>: View {
                     if let icon = leftIconName,
                         let image = UIImage(
                             named: icon,
-                            in: Bundle.module,
+                            in: Bundle.goplaysdk,
                             compatibleWith: nil
                         )
                     {

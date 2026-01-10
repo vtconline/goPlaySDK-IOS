@@ -3,8 +3,8 @@
 // AppManager.swift
 
 import Foundation
-import UIKit
 import SwiftUI
+import UIKit
 
 @MainActor
 @objc public class GoPlaySDK: NSObject {
@@ -34,7 +34,7 @@ import SwiftUI
         ApiService.shared.initWithKey(isSandBox, clientId, clientSecret)
         self.getRemoteConfig()
     }
-    
+
     @objc(getGoPlayLoginView:)
     public func getGoPlayView(type: Int)
         -> UIViewController
@@ -53,10 +53,10 @@ import SwiftUI
             view = AnyView(GoPlayPhoneLoginViewObjC())
         }
 
-        let controller = GoPlayHostingController(rootView: view)// UIHostingController(rootView: view)
+        let controller = GoPlayHostingController(rootView: view)  // UIHostingController(rootView: view)
         //ensure fullscreen
         controller.modalPresentationStyle = .pageSheet
-        
+
         controller.rootView = AnyView(
             view.environment(\.hostingController, controller))
         return controller
@@ -205,9 +205,9 @@ import SwiftUI
                             }
                         }
 
-                    }else {
+                    } else {
                         AuthManager.shared.postEventResResult(
-                            resCode:apiResponse.code,
+                            resCode: apiResponse.code,
                             error: apiResponse.message
                         )
                     }
@@ -225,14 +225,14 @@ import SwiftUI
                     error.localizedDescription
                 )
                 self._isGetConfig = true
-                
+
             }
         )
     }
 
     @objc func showLoginForm() {
-//        KeychainHelper.clearSavedData()
-//        AuthManager.shared.postEventLogin(session: nil)
+        //        KeychainHelper.clearSavedData()
+        //        AuthManager.shared.postEventLogin(session: nil)
     }
 
     @objc public func logOut() {
@@ -264,8 +264,9 @@ import SwiftUI
                             error: nil
                         )
 
-                    }else{
-                        AlertDialog.instance.show(message: apiResponse.message ?? "Đăng xuất thất bại")
+                    } else {
+                        AlertDialog.instance.show(
+                            message: apiResponse.message ?? "Đăng xuất thất bại")
                         // AuthManager.shared.postEventLogout(
                         //     error: apiResponse.message
                         // )
@@ -278,7 +279,6 @@ import SwiftUI
                     )
                 }
 
-
             },
             failure: { (error: Error) in
                 print(
@@ -286,7 +286,7 @@ import SwiftUI
                     error.localizedDescription
                 )
                 AuthManager.shared.postEventLogout(
-                    error: error.localizedDescription ?? "Đăng xuất thất bại"
+                    error: error.localizedDescription
                 )
             }
         )

@@ -115,7 +115,7 @@ public extension GoButton where Content == AnyView {
                         }
                     } else {
                         if let icon = iconName,
-                           let image = UIImage(named: icon, in: Bundle.module, compatibleWith: nil) {
+                           let image = UIImage(named: icon, in: Bundle.goplaysdk, compatibleWith: nil) {
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFit()
