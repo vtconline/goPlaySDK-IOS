@@ -25,9 +25,17 @@ Written in Swift & SwiftUI.
   s.platform         = :ios, '15.0'
   s.ios.deployment_target = '15.0'
   s.swift_version    = '5.9'
-  s.static_framework = false   # 👈 BẮT BUỘC để add firebase
+  s.static_framework = true   # 👈 BẮT BUỘC để add firebase
   s.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
+    'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
+
+    # 'MACH_O_TYPE' => 'mh_dylib'
+  }
+  # s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+   s.user_target_xcconfig = {
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
+    'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
   }
 
 
@@ -36,6 +44,8 @@ Written in Swift & SwiftUI.
   s.resource_bundles = {
   'goplaysdk' => ['Sources/goplaysdk/images/**/*']
   }
+
+ 
 
   s.frameworks = [
     'UIKit',
@@ -46,9 +56,9 @@ Written in Swift & SwiftUI.
   # Dependencies pod search GoogleSignIn --simple. ==> find latest version in cdn, in web cocoapod may not correct with podspec publish
   # s.dependency 'GoogleSignInCommunity', '~> 9.0'
   # s.dependency 'GoogleSignInSwiftSupport', '~> 9.1'
-  s.dependency 'GoogleSignIn', '~> 9.1'
-  s.dependency 'FBSDKLoginKit', '~> 16.0'
-  s.dependency 'FBSDKCoreKit',  '~> 16.0'
+  s.dependency 'VTC-GoogleSignIn', '~> 9.1'
+  s.dependency 'FBSDKLoginKit', '~> 18.0'
+  s.dependency 'FBSDKCoreKit',  '~> 18.0'
   # s.dependency 'Firebase/Analytics', '~> 12.7'
     s.dependency 'VTC-FirebaseAnalytics', '~> 12.8.0'
   # s.dependency 'Firebase/Crashlytics', '~> 12.7'
