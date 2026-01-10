@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'goplaysdk'
-  s.version          = '1.0.16'
+  s.version          = '1.0.17'
   s.summary          = 'GoPlay SDK for iOS'
 
   s.description      = <<-DESC

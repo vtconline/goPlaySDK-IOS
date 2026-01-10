@@ -26,7 +26,8 @@ import UIKit
         set { _autoLogin = newValue }
     }
 
-    @objc public func initSDK(
+    @objc(initSDK)
+    public func initSDK(
         _ isSandBox: Bool,
         _ clientId: String,
         _ clientSecret: String
@@ -36,7 +37,7 @@ import UIKit
     }
 
     @objc(getGoPlayLoginView:)
-    public func getGoPlayView(type: Int)
+    public func getGoPlayLoginView(type: Int)
         -> UIViewController
     {
         let view: AnyView
@@ -61,8 +62,8 @@ import UIKit
             view.environment(\.hostingController, controller))
         return controller
     }
-
-    @objc public func application(
+    @objc(application:openURL:options:)
+    public func application(
         _ app: UIApplication,
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
@@ -73,8 +74,8 @@ import UIKit
             options: options
         )
     }
-
-    @objc public func application(
+    @objc(application:didFinishLaunchingWithOptions:)
+    public func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication
             .LaunchOptionsKey: Any]?
@@ -85,8 +86,8 @@ import UIKit
             didFinishLaunchingWithOptions: launchOptions
         )
     }
-
-    @objc public func logEventFB(
+    @objc(logEventFB:parameters:)
+    public func logEventFB(
         eventName: String,
         parameters: [String: Any]? = nil
     ) {
@@ -95,8 +96,8 @@ import UIKit
             parameters: parameters
         )
     }
-
-    @objc public func logEvent(
+    @objc(logEvent:parameters:)
+    public func logEvent(
         _ eventName: String,
         _ parameters: [String: Any]? = nil
     ) {
@@ -105,16 +106,16 @@ import UIKit
             parameters: parameters
         )
     }
-
-    @objc public func recordError(_ error: NSError) {
+    @objc(recordError:)
+    public func recordError(_ error: NSError) {
         GoPlayFirebaseSDK.shared.recordError(error)
     }
 
     @objc public func getScreenWidth() -> CGFloat {
         return UIScreen.main.bounds.width
     }
-
-    @objc func getRemoteConfig() {
+    @objc(getRemoteConfig)
+    public func getRemoteConfig() {
         GoApiService.shared.getRemoteConfig(
             success: { (configDict: [String: Any]) in
                 //                print("Config received:", configDict)
@@ -229,8 +230,8 @@ import UIKit
             }
         )
     }
-
-    @objc func showLoginForm() {
+    @objc(showLoginForm)
+    func showLoginForm() {
         //        KeychainHelper.clearSavedData()
         //        AuthManager.shared.postEventLogin(session: nil)
     }
@@ -292,7 +293,8 @@ import UIKit
         )
     }
 
-    @objc public func startObservingLoginResultForTarget(
+    @objc(startObservingLoginResultForTarget:target:selector:)
+    public func startObservingLoginResultForTarget(
         goPlayAction: NSString,
         target: NSObject,
         selector: Selector
@@ -304,11 +306,13 @@ import UIKit
         )
     }
 
-    @objc public func cancelObserver(goPlayAction: NSString) {
+    @objc(cancelObserver:)
+    public func cancelObserver(goPlayAction: NSString) {
         GenericObserver.shared.cancelObserver(goPlayAction: goPlayAction)
     }
 
-    @objc public func cancelAllObservers() {
+    @objc(cancelAllObservers)
+    public func cancelAllObservers() {
         GenericObserver.shared.cancelAll()
     }
 
