@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'goplaysdk'
-  s.version          = '1.0.18'
+  s.version          = '1.0.19'
   s.summary          = 'GoPlay SDK for iOS'
 
   s.description      = <<-DESC
@@ -19,7 +19,7 @@ Written in Swift & SwiftUI.
 
   s.source           = {
     :git => 'https://github.com/vtconline/goPlaySDK-IOS.git',
-    :tag => 'v1.0.18'
+    :tag => 'v1.0.19'
   }
 
   s.platform         = :ios, '15.0'
@@ -40,10 +40,10 @@ Written in Swift & SwiftUI.
 
 
   s.source_files     = 'Sources/goplaysdk/**/*.swift'
-  # s.resources        = ['Sources/goplaysdk/images/**/*']
-  s.resource_bundles = {
-  'goplaysdk' => ['Sources/goplaysdk/images/**/*']
-  }
+  s.resources        = ['Sources/goplaysdk/images/**/*']
+  # s.resource_bundles = {
+  # 'goplaysdk' => ['Sources/goplaysdk/images/**/*']
+  # }
 
  
 
