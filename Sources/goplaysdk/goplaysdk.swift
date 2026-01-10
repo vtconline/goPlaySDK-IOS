@@ -26,7 +26,7 @@ import UIKit
         set { _autoLogin = newValue }
     }
 
-    @objc(initSDK)
+    @objc(initSDK:clientId:clientSecret:)
     public func initSDK(
         _ isSandBox: Bool,
         _ clientId: String,
