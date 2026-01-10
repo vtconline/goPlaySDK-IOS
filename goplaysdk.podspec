@@ -22,6 +22,7 @@ Written in Swift & SwiftUI.
     :tag => 'v1.0.19'
   }
 
+  
   s.platform         = :ios, '15.0'
   s.ios.deployment_target = '15.0'
   s.swift_version    = '5.9'
