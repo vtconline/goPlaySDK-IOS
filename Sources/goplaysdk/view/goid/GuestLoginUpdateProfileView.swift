@@ -162,7 +162,7 @@ public struct GuestLoginUpdateProfileView: View {
                     {
                         print("requestUpdate Response: \(responseDict)")
                         onUpdateInfoResponse(response: responseDict)
-                        hostingController?.close()
+                        
                     }
 
                 case .failure(let error):
@@ -210,6 +210,7 @@ public struct GuestLoginUpdateProfileView: View {
                         session: session,
                         error: nil
                     )
+                    hostingController?.close()
                 } else {
                     AlertDialog.instance.show(message: "Không đọc được Token")
                 }

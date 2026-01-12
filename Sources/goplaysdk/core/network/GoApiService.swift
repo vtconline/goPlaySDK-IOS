@@ -36,7 +36,7 @@ public class GoApiService {
         return "{}"
     }
     public func getRemoteConfig(success: @escaping ([String: Any]) -> Void, failure: @escaping (_ error : Error ) -> Void) {
-        LoadingDialog.instance.show()
+//        LoadingDialog.instance.show()
         // This would be a sample data payload to send in the POST request
         var bodyData: [String: Any] = Utils.getPartnerParams()
     
@@ -47,12 +47,12 @@ public class GoApiService {
                 sign: true
             ) { result in
 
-                LoadingDialog.instance.hide()
+//                LoadingDialog.instance.hide()
 
                 switch result {
                 case .success(let data):
                     // Handle successful response
-
+                    KeychainHelper.save(key: "vtc_remoteConfig", data: data)
                     // Parse the response if necessary
                     do {
                         let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
@@ -67,12 +67,35 @@ public class GoApiService {
                     }
 
                 case .failure(let error):
+                    if let dataSave = KeychainHelper.load(key: "vtc_remoteConfig") {
+                        do {
+                            let jsonObject = try JSONSerialization.jsonObject(with: dataSave, options: [])
+                            if let dict = jsonObject as? [String: Any] {
+                                print("Loaded remoteConfig:", dict)
+                                success(dict)
+                            } else {
+                                print("Loaded data is not a dictionary")
+                            }
+                        } catch {
+                            print("Failed to parse remoteConfig from Keychain:", error)
+//                            AlertDialog.instance.show(
+//                                message: "Không tải được cấu hình từ server"
+//                            )
+                            failure(error)
+                        }
+                    } else {
+                        // Không lấy được trong Keychain → trả về null / nil
+//                        print("No remoteConfig found in Keychain")
+//                        AlertDialog.instance.show(
+//                            message: "Không tải được cấu hình từ server"
+//                        )
+                        failure(error)
+                    }
+                    
+                
                     // Handle failure response
                     // print("Error: \(error.localizedDescription)")
-                    AlertDialog.instance.show(
-                        message: error.localizedDescription
-                    )
-                    failure(error)
+                    
                 }
             }
         }

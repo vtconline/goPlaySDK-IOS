@@ -3,7 +3,7 @@ import SwiftUI
 public struct RegisterView: View {
     //    @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
-    //    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.hostingController) private var hostingController
     @StateObject private var navigationManager = NavigationManager()
 
     @State private var userName = ""
@@ -168,6 +168,7 @@ public struct RegisterView: View {
                     KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
                     UserDefaults.standard.set(session.userName, forKey: GoConstants.savedUserName)
                     AuthManager.shared.postEventLogin(session: session, errorStr: nil)
+                    hostingController?.close()
                 } else {
                     AlertDialog.instance.show(message: "Không đọc được Token")
                 }
