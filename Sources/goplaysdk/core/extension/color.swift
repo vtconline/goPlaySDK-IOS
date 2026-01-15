@@ -2,7 +2,7 @@
 //  color.swift
 //  goplaysdk
 //
-//  Created by Ngô Đồng on 24/4/25.
+//  
 //
 
 import SwiftUI

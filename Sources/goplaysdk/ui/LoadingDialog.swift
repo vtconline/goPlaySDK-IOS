@@ -45,7 +45,7 @@ class LoadingDialog : @unchecked Sendable{
             if #available(iOS 14.0, *) {
                 uiColor = UIColor(AppTheme.Colors.primary)
             } else {
-                uiColor = AppTheme.Colors.primaryUIColor!
+                uiColor = AppTheme.Colors.primaryUIColor
             }
             spinner.color = uiColor // UIColor(AppTheme.Colors.primary)
             spinner.center = overlay.center //remove if use loadingBox
