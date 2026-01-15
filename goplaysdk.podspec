@@ -23,20 +23,20 @@ Written in Swift & SwiftUI.
   }
 
 
-  s.platform         = :ios, '15.0'
-  s.ios.deployment_target = '15.0'
+  s.platform         = :ios, '13.0'
+  s.ios.deployment_target = '13.0'
   s.swift_version    = '5.9'
   s.static_framework = true   # 👈 BẮT BUỘC để add firebase
   s.pod_target_xcconfig = {
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
-    'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
+    'IPHONEOS_DEPLOYMENT_TARGET' => '13.0'
 
     # 'MACH_O_TYPE' => 'mh_dylib'
   }
   # s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
    s.user_target_xcconfig = {
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
-    'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
+    'IPHONEOS_DEPLOYMENT_TARGET' => '13.0'
   }
 
 
