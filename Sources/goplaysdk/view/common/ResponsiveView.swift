@@ -28,7 +28,7 @@ struct ResponsiveView<PortraitContent: View, LandscapeContent: View>: View {
                 self.isLandscape = DeviceOrientation.shared.isLandscape
                 print("isLandscape \(DeviceOrientation.shared.isLandscape)")
             }
-            .onChange(of: geometry.size) { newSize in
+            .onChangeCompat(of: geometry.size) { newSize in
                 // Detect orientation changes when size changes
                 self.isLandscape = DeviceOrientation.shared.isLandscape
                 print("onChange geometry.size isLandscape \(DeviceOrientation.shared.isLandscape)")

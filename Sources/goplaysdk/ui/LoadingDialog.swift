@@ -41,7 +41,13 @@ class LoadingDialog : @unchecked Sendable{
               
             let spinner = UIActivityIndicatorView(style: .large)
             spinner.center = CGPoint(x: 50, y: 50)
-            spinner.color = UIColor(AppTheme.Colors.primary)
+            let uiColor: UIColor
+            if #available(iOS 14.0, *) {
+                uiColor = UIColor(AppTheme.Colors.primary)
+            } else {
+                uiColor = AppTheme.Colors.primaryUIColor!
+            }
+            spinner.color = uiColor // UIColor(AppTheme.Colors.primary)
             spinner.center = overlay.center //remove if use loadingBox
             spinner.startAnimating()
             

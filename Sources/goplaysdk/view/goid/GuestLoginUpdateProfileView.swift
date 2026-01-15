@@ -2,22 +2,22 @@ import SwiftUI
 
 public struct GuestLoginUpdateProfileView: View {
     @Environment(\.presentationMode) var presentationMode
-    @Environment(\.dismiss) private var dismiss
+
     @Environment(\.hostingController) private var hostingController
 
     private let onBack: () -> Void
 
-    @StateObject private var navigationManager = NavigationManager()
+    @StateObjectCompat private var navigationManager = NavigationManager()
 
     @State private var userName = ""
     @State private var passWord = ""
     @State private var phoneNumber = ""
     @State private var email = ""
 
-    @StateObject private var userNameValidator = UsernameValidator()
-    @StateObject private var passwordValidator = PasswordValidator()
-    @StateObject private var phoneNumberValidator = PhoneValidator()
-    @StateObject private var emailValidator = EmailValidator()
+    @StateObjectCompat private var userNameValidator = UsernameValidator()
+    @StateObjectCompat private var passwordValidator = PasswordValidator()
+    @StateObjectCompat private var phoneNumberValidator = PhoneValidator()
+    @StateObjectCompat private var emailValidator = EmailValidator()
 
     public init(onBack: @escaping () -> Void = {}) {
         self.onBack = onBack
@@ -75,22 +75,12 @@ public struct GuestLoginUpdateProfileView: View {
         .observeOrientation()  // Apply the modifier to detect orientation changes
         .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
         //        .navigationBarHidden(true) // hide navigaotr bar at top
-        .navigationTitle("Chơi ngay")
+        .compatNavigationTitle("Chơi ngay")
         //                .navigationBarBackButtonHidden(false) // Show back button (default)
 
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    onBack()
-                    dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("Quay lại")  // ← Custom back button text
-                    }
-                }
-            }
+        .compatToolbar {
+            GoPlayDismissButton()
         }
 
     }

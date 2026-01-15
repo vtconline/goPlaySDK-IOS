@@ -1,7 +1,6 @@
 import SwiftUI
-
+@available(iOS 15.0, *)
 public struct ResetPwdView: View {
-    @Environment(\.dismiss) var dismiss
     @Environment(\.hostingController) private var hostingController
     @StateObject private var navigationManager = NavigationManager()
 
@@ -34,23 +33,14 @@ public struct ResetPwdView: View {
         )
         .observeOrientation()  // Apply the modifier to detect orientation changes
         //        .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
-        //        .resetNavigationWhenInActive(navigationManager: navigationManager, scenePhase: scenePhase)
+        
         //        .navigationBarHidden(true) // hide navigaotr bar at top
-        .navigationTitle("Quên mật khẩu")
+        .compatNavigationTitle("Quên mật khẩu")
         //                .navigationBarBackButtonHidden(false) // Show back button (default)
 
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("Quay lại")  // ← Custom back button text
-                    }
-                }
-            }
+        .compatToolbar {
+            GoPlayDismissButton()
         }
     }
     func bodyViewPortraid() -> some View {
@@ -108,6 +98,7 @@ public struct ResetPwdView: View {
 
     }
 
+    
     func bodyViewLandScape() -> some View {
 
         List {

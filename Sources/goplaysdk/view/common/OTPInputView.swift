@@ -19,7 +19,7 @@ public struct OTPInputView: View {
                 .textContentType(.oneTimeCode)
                 .foregroundColor(.clear)
                 .accentColor(.clear)
-                .onChange(of: otp) {
+                .onChangeCompat(of: otp) {
                     otp = String($0.prefix(length))
                 }
 

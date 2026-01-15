@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "goplaysdk",
     platforms: [
-            .iOS(.v15)  // Setting the minimum iOS version to 15.0
+            .iOS(.v13)  // Setting the minimum iOS version to 15.0
         ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -19,7 +19,7 @@ let package = Package(
             //.package(url: "https://github.com/vapor/jwt-kit.git", from: "5.0.0"),
             .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "7.0.0"),
             .package(url: "https://github.com/facebook/facebook-ios-sdk.git", exact: "14.1.0"),
-            .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "12.1.0"),
+            .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "11.15.0"),
             .package(url: "https://github.com/Kitura/Swift-JWT.git", from: "4.0.2")
         ],
     targets: [

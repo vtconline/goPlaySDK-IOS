@@ -9,7 +9,7 @@ struct OrientationObserverModifier: ViewModifier {
                 // Initial orientation check when the view appears
                 DeviceOrientation.shared.updateOrientation()
             }
-            .onChange(of: UIScreen.main.bounds.size) { _ in
+            .onChangeCompat(of: UIScreen.main.bounds.size) { _ in
                 // Update orientation on size change
                 DeviceOrientation.shared.updateOrientation()
             }

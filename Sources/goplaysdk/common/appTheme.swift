@@ -11,9 +11,15 @@ import SwiftUI
 
 public class AppTheme {
     public struct Colors {
-      public static let primary = Color(hex: "#5CC9F0")
-      public  static let secondary = Color(hex: "#A0D468")
-      public  static let apple = Color(hex: "#000000")
+        // ✅ UIKit – source of truth
+        public static let primaryUIColor   = UIColor(named: "#5CC9F0")
+                public static let secondaryUIColor = UIColor(named: "#A0D468")
+                public static let appleUIColor     = UIColor(named: "#000000")
+
+                // ✅ SwiftUI – wrap lại
+        public static let primary   = Color(primaryUIColor!)
+                public static let secondary = Color(secondaryUIColor!)
+                public static let apple     = Color(appleUIColor!)
     }
     
     public struct Fonts {

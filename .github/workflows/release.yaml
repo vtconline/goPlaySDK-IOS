@@ -3,7 +3,7 @@ name: Tag and Release Swift Library
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   release:

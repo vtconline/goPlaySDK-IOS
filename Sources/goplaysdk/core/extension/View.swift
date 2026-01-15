@@ -32,17 +32,17 @@ extension View {
             )
     }
     
-    func hideNavigationTitleWhenLandscape() -> some View {
+    func hidecompatNavigationTitleWhenLandscape() -> some View {
         self
             .onAppear {
-                updateNavigationTitleVisibility()
+                updatecompatNavigationTitleVisibility()
                 NotificationCenter.default.addObserver(
                     forName: UIDevice.orientationDidChangeNotification,
                     object: nil,
                     queue: .main
                 ) { _ in
                     Task { @MainActor in
-                                            updateNavigationTitleVisibility()
+                                            updatecompatNavigationTitleVisibility()
                     }
                 }
             }
@@ -55,7 +55,7 @@ extension View {
             }
     }
     @MainActor
-    private func updateNavigationTitleVisibility() {
+    private func updatecompatNavigationTitleVisibility() {
         #if canImport(UIKit)
         let orientation = UIDevice.current.orientation
 
@@ -75,19 +75,7 @@ extension View {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
         #endif
     }
-    // Function to reset navigation when app goes inactive
-    public func resetNavigationWhenInActive(
-        navigationManager: NavigationManager,
-        scenePhase: ScenePhase
-    ) -> some View {
-        self.onChange(of: scenePhase) { phase in
-            print("navigationManager.resetNavigation phase = \(phase) ")
-            if phase == .inactive {
-                print("navigationManager.resetNavigation call ")
-                navigationManager.resetNavigation()
-            }
-        }
-    }
+    
 
     public func navigateToDestination(navigationManager: NavigationManager)
         -> some View
@@ -116,6 +104,30 @@ extension View {
             }
         )
     }
+    
+    @ViewBuilder
+    public func compatNavigationTitle(_ title: String) -> some View {
+            if #available(iOS 14.0, *) {
+                self.navigationTitle(title)
+            } else {
+                self.navigationBarTitle(title)
+            }
+        }
+    
+    @ViewBuilder
+    public func compatToolbar<Content: View>(
+            @ViewBuilder content: () -> Content
+        ) -> some View {
+            if #available(iOS 14.0, *) {
+                self.toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        content()
+                    }
+                }
+            } else {
+                self.navigationBarItems(leading: content())
+            }
+        }
 
     // Helper function to return the appropriate view based on the navigation destination
     private func navigateToDestinationView(destination: NavigationDestination?)
@@ -132,6 +144,8 @@ extension View {
             return AnyView(EmptyView())  // No navigation
         }
     }
+    
+    
 }
 // Move NavigationDestination outside of NavigationManager
 public enum NavigationDestination {

@@ -154,7 +154,7 @@ struct GoTextField<Validator: TextFieldValidator>: View {
             }
         }
         // Validate text input on change
-        .onChange(of: text) { _ in
+        .onChangeCompat(of: text) { _ in
             if !validator.isValid {
                 validator.validate(text: text)
             }

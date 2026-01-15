@@ -3,10 +3,9 @@ import SwiftUI
 //0394253555
 public struct PhoneLoginView: View {
     @Environment(\.presentationMode) var presentationMode
-    @Environment(\.dismiss) var dismiss
+
     @Environment(\.hostingController) private var hostingController
-    @Environment(\.scenePhase) private var scenePhase
-    @StateObject private var navigationManager = NavigationManager()
+    @StateObjectCompat private var navigationManager = NavigationManager()
 
     @State private var phoneNumber = ""  // Store the phone number
     @State private var otp = ""  // Store the OTP
@@ -15,8 +14,8 @@ public struct PhoneLoginView: View {
     @State private var alertMessage = ""  // Alert message
     @State private var isLoading = false  // Loading state for API calls
 
-    @StateObject private var phoneNumberValidator = PhoneValidator()  // Validator for phone number
-    @StateObject private var otpValidator = OTPValidator()  // Validator for OTP
+    @StateObjectCompat private var phoneNumberValidator = PhoneValidator()  // Validator for phone number
+    @StateObjectCompat private var otpValidator = OTPValidator()  // Validator for OTP
 
     @State private var checkPhoneDone = false
     @State private var buttonOtpText = "Click Me"
@@ -105,23 +104,14 @@ public struct PhoneLoginView: View {
         .padding()
         .observeOrientation()  // Apply the modifier to detect orientation changes
         //        .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
-        //        .resetNavigationWhenInActive(navigationManager: navigationManager, scenePhase: scenePhase)
+        
         //        .navigationBarHidden(true) // hide navigaotr bar at top
-        .navigationTitle("Đăng nhập với SĐT")
+        .compatNavigationTitle("Đăng nhập với SĐT")
         //                .navigationBarBackButtonHidden(false) // Show back button (default)
 
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("Quay lại")  // ← Custom back button text
-                    }
-                }
-            }
+        .compatToolbar {
+            GoPlayDismissButton()
         }
         .background(Color.white)
         .dismissKeyboardOnInteraction()

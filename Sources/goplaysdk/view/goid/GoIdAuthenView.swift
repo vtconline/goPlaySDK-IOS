@@ -1,10 +1,9 @@
 import SwiftUI
 
 public struct GoIdAuthenView: View {
-    @Environment(\.dismiss) var dismiss
     @Environment(\.hostingController) private var hostingController
 
-    @StateObject private var navigationManager = NavigationManager()
+    @StateObjectCompat private var navigationManager = NavigationManager()
 
     @State private var username = ""  // Store the username
     @State private var password = ""  // Store the password
@@ -15,8 +14,8 @@ public struct GoIdAuthenView: View {
     @State private var rememberMe = true  // 🔐 Toggle for remembering credentials
     @State private var isShowingSafari = false
 
-    @StateObject private var usernameValidator = UsernameValidator()
-    @StateObject private var pwdValidator = PasswordValidator()
+    @StateObjectCompat private var usernameValidator = UsernameValidator()
+    @StateObjectCompat private var pwdValidator = PasswordValidator()
 
     let enalbeSocialLogin: Bool
 
@@ -64,7 +63,7 @@ public struct GoIdAuthenView: View {
                     ),
                     alignment: .center
                 )
-                .onChange(of: rememberMe) { newValue in
+                .onChangeCompat(of: rememberMe) { newValue in
                     //print("✅ rememberMe: \(newValue ? "On" : "Off")")
                     UserDefaults.standard.set(
                         rememberMe,
@@ -87,7 +86,7 @@ public struct GoIdAuthenView: View {
                         .padding(.horizontal, 10)  // Horizontal padding for the button
                 }
 
-                if AuthManager.shared.isActivePhone() {
+                if #available(iOS 15.0, *), AuthManager.shared.isActivePhone() {
                     NavigationLink(destination: ResetPwdView()) {
                         Text("Quên mật khẩu?")
                             .foregroundColor(.blue)
@@ -148,23 +147,13 @@ public struct GoIdAuthenView: View {
         .background(Color.white)
         .observeOrientation()
         .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
-        .navigationTitle("Đăng nhập GoID")
-        //        .hideNavigationTitleWhenLandscape()
+        .compatNavigationTitle("Đăng nhập GoID")
+        //        .hidecompatNavigationTitleWhenLandscape()
         //.navigationBarBackButtonHidden(false) // Show back button (default)
 
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("Quay lại")  // ← Custom back button text
-                    }
-                }
-            }
+        .compatToolbar {
+            GoPlayDismissButton()
         }
         .dismissKeyboardOnInteraction()
     }

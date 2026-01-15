@@ -74,7 +74,10 @@ public class AlertDialog: @unchecked Sendable {
             }
             
             // Get the root view controller from the key window
-            baseVC = base ?? scene.keyWindow?.rootViewController
+//            baseVC = base ?? scene.keyWindow?.rootViewController ios15 only
+            baseVC = base ?? scene.windows
+                .first(where: { $0.isKeyWindow })?
+                .rootViewController
 
             // Recursively find the top view controller
             if let nav = baseVC as? UINavigationController {

@@ -115,8 +115,11 @@ public class GoogleSignInManager {
             }
 
             // Try to access the root view controller from the key window
-            baseVC = base ?? scene.keyWindow?.rootViewController
-
+//            baseVC = base ?? scene.keyWindow?.rootViewController. ios 15 only
+            baseVC = base ?? scene.windows
+                .first(where: { $0.isKeyWindow })?
+                .rootViewController
+            
             // If no base view controller is found, notify completion handler
             if baseVC == nil {
                 completion?(nil)
