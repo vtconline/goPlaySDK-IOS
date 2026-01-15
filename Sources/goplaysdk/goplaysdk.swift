@@ -48,6 +48,10 @@ import UIKit
             view = AnyView(GoPlayPhoneLoginViewObjC())
         case GoSwiftViewType.goid:
             view = AnyView(GoPlayGoIdLoginViewObjC())
+        case GoSwiftViewType.goidHideSocialLogin:
+            view = AnyView(GoPlayGoIdLoginViewObjC(enalbeSocialLogin: false))
+        case GoSwiftViewType.goidNewFlow:
+            view = AnyView(GoPlayGoIdLoginViewObjC())
         case GoSwiftViewType.updateProfile:
             view = AnyView(GuestLoginUpdateProfileViewObjC())
         default:

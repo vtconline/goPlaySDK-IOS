@@ -18,7 +18,11 @@ public struct GoIdAuthenView: View {
     @StateObject private var usernameValidator = UsernameValidator()
     @StateObject private var pwdValidator = PasswordValidator()
 
-    public init() {}
+    let enalbeSocialLogin: Bool
+
+    public init(enalbeSocialLogin: Bool = true) {
+        self.enalbeSocialLogin = enalbeSocialLogin
+    }
 
     var spaceOriented: CGFloat {
         // Dynamically set space based on the device orientation
@@ -27,7 +31,7 @@ public struct GoIdAuthenView: View {
 
     public var body: some View {
         VStack(alignment: .center, spacing: spaceOriented) {
-            
+
             GoTextField<UsernameValidator>(
                 text: $username, placeholder: "Tên đăng nhập", isPwd: false,
                 validator: usernameValidator, leftIconName: "ic_user_focused",  // This should be the name of your image in Resources/Images
@@ -90,12 +94,13 @@ public struct GoIdAuthenView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .center)  // Center the buttons horizontally
- 
+
             .padding(.top, spaceOriented)  // Space between login and buttons in row
             .padding(.bottom, spaceOriented)
+            if enalbeSocialLogin == true {
+                SocialLoginGroupView(haveGoIdLogin: false)
+            }
 
-            SocialLoginGroupView(haveGoIdLogin: false)
-            
         }
         .padding()
         .onAppear {
@@ -115,13 +120,13 @@ public struct GoIdAuthenView: View {
             }
 
         }
-//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)  //topLeading
+        //        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)  //topLeading
         .adaptiveVerticalAlignment()
         .background(Color.white)
         .observeOrientation()
         .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
         .navigationTitle("Đăng nhập GoID")
-//        .hideNavigationTitleWhenLandscape()
+        //        .hideNavigationTitleWhenLandscape()
         //.navigationBarBackButtonHidden(false) // Show back button (default)
 
         .navigationBarBackButtonHidden(true)
@@ -129,7 +134,7 @@ public struct GoIdAuthenView: View {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
                     dismiss()
-                    
+
                 }) {
                     HStack {
                         Image(systemName: "chevron.left")
