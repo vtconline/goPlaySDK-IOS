@@ -1,8 +1,8 @@
 import UIKit
 import SwiftUI
 
-@MainActor
-public class AlertDialog {
+//@MainActor
+public class AlertDialog: @unchecked Sendable {
     public static let instance = AlertDialog()
     private init() {}
 
@@ -15,6 +15,7 @@ public class AlertDialog {
     ///   - cancelTitle: optional text for Cancel button
     ///   - onOk: optional callback when OK is tapped
     ///   - onCancel: optional callback when Cancel is tapped
+    @MainActor
     public func show(
         title: String? = nil,
         message: String,
@@ -29,25 +30,26 @@ public class AlertDialog {
             
             // Proceed with topVC
 //            print("Top View Controller: \(topVC)")
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-
-            if let cancel = cancelTitle {
-                alert.addAction(UIAlertAction(title: cancel, style: .cancel) { _ in
-                    onCancel?()
-                })
-            }
-
-            alert.addAction(UIAlertAction(title: okTitle, style: .default) { _ in
-                onOk?()
-                
-                
-                // Check if a navigator view is provided and present it
-                            if let view = navigatorView {
-                                let hostingController = UIHostingController(rootView: AnyView(view))
-                                topVC.present(hostingController, animated: true)
-                            }
-            })
+            
             DispatchQueue.main.async {
+                let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+
+                if let cancel = cancelTitle {
+                    alert.addAction(UIAlertAction(title: cancel, style: .cancel) { _ in
+                        onCancel?()
+                    })
+                }
+
+                alert.addAction(UIAlertAction(title: okTitle, style: .default) { _ in
+                    onOk?()
+                    
+                    
+                    // Check if a navigator view is provided and present it
+                                if let view = navigatorView {
+                                    let hostingController = UIHostingController(rootView: AnyView(view))
+                                    topVC.present(hostingController, animated: true)
+                                }
+                })
                 topVC.present(alert, animated: true, completion: nil)
             }
         }
@@ -57,6 +59,7 @@ public class AlertDialog {
     }
 
     /// Get the top most view controller to present from
+    @MainActor
     private func topViewController(base: UIViewController? = nil, completion: ((UIViewController?) -> Void)? = nil) {
         var baseVC: UIViewController?
 

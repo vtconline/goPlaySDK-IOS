@@ -1,6 +1,6 @@
 import Foundation
-@MainActor
-public class GoPlayUUID {
+//@MainActor
+public class GoPlayUUID: @unchecked Sendable {
     
     public static let shared = GoPlayUUID()
     

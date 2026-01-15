@@ -206,10 +206,8 @@ public struct GuestLoginUpdateProfileView: View {
                         key: GoConstants.goPlaySession,
                         data: session
                     )
-                    AuthManager.shared.postEventAccountLinking(
-                        session: session,
-                        error: nil
-                    )
+                    AuthManager.shared.handleAccountLinking(session)
+                   
                     hostingController?.close()
                 } else {
                     AlertDialog.instance.show(message: "Không đọc được Token")

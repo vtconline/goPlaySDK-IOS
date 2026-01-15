@@ -1,7 +1,7 @@
 
 import UIKit
-@MainActor
-class LoadingDialog {
+//@MainActor
+class LoadingDialog : @unchecked Sendable{
     // Singleton instance
     static let instance = LoadingDialog()
     

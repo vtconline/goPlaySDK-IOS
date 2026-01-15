@@ -28,7 +28,7 @@ public struct SelectLoginType: View {
             )
             GoNavigationLink(
                 text: "ĐĂNG NHẬP GOID",
-                destination: GoIdAuthenView(),
+                destination: GoIdAuthenView(enalbeSocialLogin: false),
                 assetImageName: "logo_goplay",
 
                 imageSize: CGSize(width: 24, height: 24),

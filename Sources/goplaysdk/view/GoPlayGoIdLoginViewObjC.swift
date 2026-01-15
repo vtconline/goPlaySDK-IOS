@@ -4,7 +4,10 @@
 import SwiftUI
 
 public struct GoPlayGoIdLoginViewObjC: View {
-    public init() {}
+    let haveSocialLogin: Bool
+    public init(haveSocialLogin: Bool = true) {
+        self.haveSocialLogin = haveSocialLogin
+    }
 
     public var body: some View {
         // Kiểm tra nếu là iOS 16 trở lên, dùng NavigationStack
@@ -12,12 +15,12 @@ public struct GoPlayGoIdLoginViewObjC: View {
             HeaderView()
             if #available(iOS 16.0, *) {
                 NavigationStack {
-                    GoIdAuthenView()
+                    GoIdAuthenView(enalbeSocialLogin: haveSocialLogin)
                 }
             } else {
                 // Nếu iOS < 16, dùng NavigationView
                 NavigationView {
-                    GoIdAuthenView()
+                    GoIdAuthenView(enalbeSocialLogin: haveSocialLogin)
                 }
             }
         }

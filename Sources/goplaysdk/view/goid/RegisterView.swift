@@ -56,7 +56,11 @@ public struct RegisterView: View {
 
             .padding(.horizontal, 16)
 
-            GoButton(text: "ĐĂNG KÝ", action: submitLoginPhone)
+            GoButton(text: "ĐĂNG KÝ", action: {
+                Task { @MainActor in
+                        await submitLoginPhone()
+                    }
+            })
 
             Spacer()
         }
@@ -84,7 +88,7 @@ public struct RegisterView: View {
 
     }
 
-    private func submitLoginPhone() {
+    private func submitLoginPhone() async {
         guard !userName.isEmpty, !passWord.isEmpty else {
             AlertDialog.instance.show(message: "Vui lòng nhập tài khoản và mật khẩu")
             return
@@ -119,31 +123,37 @@ public struct RegisterView: View {
         }
 
         // Now, you can call the `post` method on ApiService
-        Task {
-            await ApiService.shared.post(path: GoApi.oauthRegister, body: bodyData) { result in
+        
+             await ApiService.shared.post(path: GoApi.oauthRegister, body: bodyData) { result in
+                 Task{@MainActor in
+                     LoadingDialog.instance.hide()
 
-                LoadingDialog.instance.hide()
+                     switch result {
+                     case .success(let data):
+                         // Handle successful response
 
-                switch result {
-                case .success(let data):
-                    // Handle successful response
+                         // Parse the response if necessary
+                         if let jsonResponse = try? JSONSerialization.jsonObject(
+                             with: data, options: []),
+                             let responseDict = jsonResponse as? [String: Any]
+                         {
+                             // print("onRegisterResponse Response: \(responseDict)")
+                             onRegisterResponse(response: responseDict)
+                             
+                         }
 
-                    // Parse the response if necessary
-                    if let jsonResponse = try? JSONSerialization.jsonObject(
-                        with: data, options: []),
-                        let responseDict = jsonResponse as? [String: Any]
-                    {
-                        // print("onRegisterResponse Response: \(responseDict)")
-                        onRegisterResponse(response: responseDict)
-                    }
-
-                case .failure(let error):
-                    // Handle failure response
-                    //                    print("Error: \(error.localizedDescription)")
-                    AlertDialog.instance.show(message: error.localizedDescription)
-                }
-            }
-        }
+                     case .failure(let error):
+                         // Handle failure response
+                         //                    print("Error: \(error.localizedDescription)")
+                         AlertDialog.instance.show(message: error.localizedDescription)
+                     }
+                 }
+               
+           }
+        
+       
+             
+        
     }
 
     func onRegisterResponse(response: [String: Any]) {
@@ -165,9 +175,8 @@ public struct RegisterView: View {
                 }
                 let tokenData: TokenData = apiResponse.data!
                 if let session = GoPlaySession.deserialize(data: tokenData) {
-                    KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
                     UserDefaults.standard.set(session.userName, forKey: GoConstants.savedUserName)
-                    AuthManager.shared.postEventLogin(session: session, errorStr: nil)
+                    AuthManager.shared.handleLoginSuccess(session)
                     hostingController?.close()
                 } else {
                     AlertDialog.instance.show(message: "Không đọc được Token")

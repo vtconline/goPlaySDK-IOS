@@ -18,7 +18,11 @@ public struct GoIdAuthenView: View {
     @StateObject private var usernameValidator = UsernameValidator()
     @StateObject private var pwdValidator = PasswordValidator()
 
-    public init() {}
+    let enalbeSocialLogin: Bool
+
+    public init(enalbeSocialLogin: Bool = true) {
+        self.enalbeSocialLogin = enalbeSocialLogin
+    }
 
     var spaceOriented: CGFloat {
         // Dynamically set space based on the device orientation
@@ -27,10 +31,13 @@ public struct GoIdAuthenView: View {
 
     public var body: some View {
         VStack(alignment: .center, spacing: spaceOriented) {
-            
+
             GoTextField<UsernameValidator>(
-                text: $username, placeholder: "Tên đăng nhập", isPwd: false,
-                validator: usernameValidator, leftIconName: "ic_user_focused",  // This should be the name of your image in Resources/Images
+                text: $username,
+                placeholder: "Tên đăng nhập",
+                isPwd: false,
+                validator: usernameValidator,
+                leftIconName: "ic_user_focused",  // This should be the name of your image in Resources/Images
                 isSystemIcon: false,
                 //                                           keyBoardFocused: $usernameFocus
             )
@@ -51,13 +58,18 @@ public struct GoIdAuthenView: View {
                 .foregroundColor(Color.black)
                 .frame(
                     maxWidth: min(
-                        UIScreen.main.bounds.width - 2 * AppTheme.Paddings.horizontal,
+                        UIScreen.main.bounds.width - 2
+                            * AppTheme.Paddings.horizontal,
                         300
-                    ), alignment: .center
+                    ),
+                    alignment: .center
                 )
                 .onChange(of: rememberMe) { newValue in
                     //print("✅ rememberMe: \(newValue ? "On" : "Off")")
-                    UserDefaults.standard.set(rememberMe, forKey: GoConstants.rememberMe)
+                    UserDefaults.standard.set(
+                        rememberMe,
+                        forKey: GoConstants.rememberMe
+                    )
                     if !newValue {
                         KeychainHelper.remove(key: GoConstants.savedPassword)
                     }
@@ -75,39 +87,55 @@ public struct GoIdAuthenView: View {
                         .padding(.horizontal, 10)  // Horizontal padding for the button
                 }
 
-                GoButton(
-                    color: .white, padding: EdgeInsets(), useDefaultWidth: false,
-                    action: {
-                        isShowingSafari = true
+                if AuthManager.shared.isActivePhone() {
+                    NavigationLink(destination: ResetPwdView()) {
+                        Text("Quên mật khẩu?")
+                            .foregroundColor(.blue)
+                            .padding(.horizontal, 10)
                     }
-                ) {
-                    Text("Quên mật khẩu?")
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 10)
+                } else {
+                    GoButton(
+                        color: .white, padding: EdgeInsets(), useDefaultWidth: false,
+                        action: {
+                            isShowingSafari = true
+                        }
+                    ) {
+                        Text("Quên mật khẩu?")
+                            .foregroundColor(.blue)
+                            .padding(.horizontal, 10)
+                    }
+                    .sheet(isPresented: $isShowingSafari) {
+                        SafariView(url: URL(string: GoConstants.urlForgotPassword)!)
+                    }
                 }
-                .sheet(isPresented: $isShowingSafari) {
-                    SafariView(url: URL(string: GoConstants.urlForgotPassword)!)
-                }
+                
+
+                
             }
             .frame(maxWidth: .infinity, alignment: .center)  // Center the buttons horizontally
- 
+
             .padding(.top, spaceOriented)  // Space between login and buttons in row
             .padding(.bottom, spaceOriented)
+            if enalbeSocialLogin {
+                SocialLoginGroupView(haveGoIdLogin: false)
+            }
 
-            SocialLoginGroupView(haveGoIdLogin: false)
-            
         }
         .padding()
         .onAppear {
-            let saveRememberMe = UserDefaults.standard.bool(forKey: GoConstants.rememberMe)
+            let saveRememberMe = UserDefaults.standard.bool(
+                forKey: GoConstants.rememberMe
+            )
             rememberMe = saveRememberMe
             if saveRememberMe {
                 if let savedUsername = UserDefaults.standard.string(
-                    forKey: GoConstants.savedUserName)
-                {
+                    forKey: GoConstants.savedUserName
+                ) {
                     username = savedUsername
                 }
-                if let pwdData = KeychainHelper.load(key: GoConstants.savedPassword),
+                if let pwdData = KeychainHelper.load(
+                    key: GoConstants.savedPassword
+                ),
                     let pwd = String(data: pwdData, encoding: .utf8)
                 {
                     password = pwd
@@ -115,13 +143,13 @@ public struct GoIdAuthenView: View {
             }
 
         }
-//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)  //topLeading
+        //        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)  //topLeading
         .adaptiveVerticalAlignment()
         .background(Color.white)
         .observeOrientation()
         .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
         .navigationTitle("Đăng nhập GoID")
-//        .hideNavigationTitleWhenLandscape()
+        //        .hideNavigationTitleWhenLandscape()
         //.navigationBarBackButtonHidden(false) // Show back button (default)
 
         .navigationBarBackButtonHidden(true)
@@ -129,7 +157,7 @@ public struct GoIdAuthenView: View {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
                     dismiss()
-                    
+
                 }) {
                     HStack {
                         Image(systemName: "chevron.left")
@@ -149,9 +177,15 @@ public struct GoIdAuthenView: View {
             return
         }
         if rememberMe {
-            UserDefaults.standard.set(username, forKey: GoConstants.savedUserName)
+            UserDefaults.standard.set(
+                username,
+                forKey: GoConstants.savedUserName
+            )
             if let pwdData = password.data(using: .utf8) {
-                KeychainHelper.save(key: GoConstants.savedPassword, data: pwdData)
+                KeychainHelper.save(
+                    key: GoConstants.savedPassword,
+                    data: pwdData
+                )
             }
         } else {
             KeychainHelper.remove(key: GoConstants.savedPassword)
@@ -174,7 +208,8 @@ public struct GoIdAuthenView: View {
 
         // Now, you can call the `post` method on ApiService
         Task {
-            await ApiService.shared.post(path: GoApi.oauthLogin, body: bodyData) { result in
+            await ApiService.shared.post(path: GoApi.oauthLogin, body: bodyData)
+            { result in
 
                 LoadingDialog.instance.hide()
 
@@ -184,7 +219,9 @@ public struct GoIdAuthenView: View {
 
                     // Parse the response if necessary
                     if let jsonResponse = try? JSONSerialization.jsonObject(
-                        with: data, options: []),
+                        with: data,
+                        options: []
+                    ),
                         let responseDict = jsonResponse as? [String: Any]
                     {
                         print("submitLoginGoId Response: \(responseDict)")
@@ -195,7 +232,9 @@ public struct GoIdAuthenView: View {
                 case .failure(let error):
                     // Handle failure response
                     //                    print("Error: \(error.localizedDescription)")
-                    AlertDialog.instance.show(message: error.localizedDescription)
+                    AlertDialog.instance.show(
+                        message: error.localizedDescription
+                    )
                 }
             }
         }
@@ -203,9 +242,14 @@ public struct GoIdAuthenView: View {
 
     func onLoginResponse(response: [String: Any]) {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: response, options: [])
+            let jsonData = try JSONSerialization.data(
+                withJSONObject: response,
+                options: []
+            )
             let apiResponse = try JSONDecoder().decode(
-                GoPlayApiResponse<TokenData>.self, from: jsonData)
+                GoPlayApiResponse<TokenData>.self,
+                from: jsonData
+            )
 
             var message = "Lỗi đăng nhập"
 
@@ -216,18 +260,22 @@ public struct GoIdAuthenView: View {
                 )
                 if apiResponse.data != nil {
                     let tokenData: TokenData = apiResponse.data!
-                    if let session = GoPlaySession.deserialize(data: tokenData) {
-                        KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
-                        AuthManager.shared.postEventLogin(session: session, errorStr: nil)
+                    if let session = GoPlaySession.deserialize(data: tokenData)
+                    {
+                        AuthManager.shared.handleLoginSuccess(session)
                         hostingController?.close()
                     } else {
-                        AlertDialog.instance.show(message: "Không đọc được Token")
+                        AlertDialog.instance.show(
+                            message: "Không đọc được Token"
+                        )
                     }
                 }
 
             } else {
                 message = apiResponse.message
-                print("onLoginResponse fail onRequestSuccess userName: \(message)")
+                print(
+                    "onLoginResponse fail onRequestSuccess userName: \(message)"
+                )
                 AlertDialog.instance.show(message: apiResponse.message)
             }
 

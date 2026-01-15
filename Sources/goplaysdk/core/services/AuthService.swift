@@ -1,9 +1,9 @@
 import Combine
 import Foundation
 
-@MainActor
-@objc public class AuthManager: NSObject {
-    @objc public static let shared = AuthManager()
+//@MainActor
+@objc public class AuthService: NSObject, @unchecked Sendable {
+    @objc public static let shared = AuthService()
     public override init() {
         super.init()
     }
@@ -97,7 +97,7 @@ import Foundation
 
 // MARK: - ObjC-compatible Enum Wrapper
 
-@objc public class LoginResultObjC: NSObject {
+@objc public final class LoginResultObjC: NSObject, Sendable {
     @objc public let session: GoPlaySession?
     @objc public let error: NSError?
 

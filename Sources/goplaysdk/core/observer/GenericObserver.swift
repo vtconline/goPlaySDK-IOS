@@ -168,19 +168,19 @@ import Foundation
     >? {
         switch action {
         case GoPlayEvent.loginResult:
-            return AuthManager.shared.loginResultPublisher
+            return AuthService.shared.loginResultPublisher
                 .map { $0 as AnyObject }
                 .eraseToAnyPublisher()
         case GoPlayEvent.logoutResult:
-            return AuthManager.shared.logoutResultPublisher
+            return AuthService.shared.logoutResultPublisher
                 .map { $0 as AnyObject }
                 .eraseToAnyPublisher()
         case GoPlayEvent.linkingAccount:
-            return AuthManager.shared.accountLinkingPublisher
+            return AuthService.shared.accountLinkingPublisher
                 .map { $0 as AnyObject }
                 .eraseToAnyPublisher()
         case GoPlayEvent.tokenExpire:
-            return AuthManager.shared.resResultPublisher
+            return AuthService.shared.resResultPublisher
                 .map { $0 as AnyObject }
                 .eraseToAnyPublisher()
 

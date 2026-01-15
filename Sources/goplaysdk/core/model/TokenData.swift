@@ -1,6 +1,6 @@
 
 
-struct TokenData: Codable {
+public struct TokenData: Codable {
     let accessToken: String
     let refreshToken: String
     let expiresIn: Int
@@ -16,7 +16,7 @@ struct TokenData: Codable {
     }
     
     // Custom decoding to default deviceId to an empty string if it's null
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         // Decode the required fields

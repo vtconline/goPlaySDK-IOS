@@ -9,7 +9,8 @@ import Foundation
 import Security
 
 class KeychainHelper {
-    @MainActor static func loadCurrentSession() -> GoPlaySession? {
+    //@MainActor 
+    static func loadCurrentSession() -> GoPlaySession? {
         if let loadedSession: GoPlaySession = KeychainHelper.load(
             key: GoConstants.goPlaySession, type: GoPlaySession.self)
         {

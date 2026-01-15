@@ -2,7 +2,7 @@ import Foundation
 import SwiftJWT
 
 @MainActor
-public class ApiService {
+public class ApiService : @unchecked Sendable {
     private var isSandBox = false
     private var baseURL = GoApi.apiSandbox
 
@@ -56,6 +56,8 @@ public class ApiService {
     func post(path: String, body: [String: Any], sign: Bool = true, completion: @escaping (Result<Data, Error>) -> Void) async {
         await request(method: "POST", path: path, body: body, sign: sign, completion: completion)
     }
+    
+ 
 
     private func request(
         method: String,

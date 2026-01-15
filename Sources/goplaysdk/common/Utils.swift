@@ -29,7 +29,8 @@ public class Utils {
 
         return timer
     }
-    @MainActor static func getPartnerParams() -> [String: Any] {
+//    @MainActor 
+    static func getPartnerParams() -> [String: Any] {
         var params = [String: Any]()
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
         let majorVersion = osVersion.majorVersion

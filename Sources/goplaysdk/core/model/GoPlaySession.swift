@@ -2,7 +2,7 @@
 import Foundation
 
 
-@objc public class GoPlaySession: NSObject,Codable {
+@objc public final class GoPlaySession: NSObject,Codable, @unchecked Sendable {
     @objc public var  accessToken: String? = nil
     @objc public var  refreshToken: String? = nil
     @objc public var  expiresIn: Int = 0
