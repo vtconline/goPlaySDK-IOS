@@ -21,7 +21,7 @@ public struct GoIdAuthenViewV2: View {
     @State private var isShowingSafari = false
 
     @StateObjectCompat private var usernameValidator = UsernameValidator()
-    @StateObjectCompat private var pwdValidator = PasswordValidator()
+    @StateObjectCompat private var pwdValidator = PasswordSimpleValidator()
     
     @State private var showUIUpdatePhone = false
     
@@ -82,7 +82,7 @@ public struct GoIdAuthenViewV2: View {
                         .padding(.vertical, 10)
                         .frame(maxWidth: 300, alignment: .leading)
                     
-                    GoTextField<PasswordValidator>(
+                    GoTextField<PasswordSimpleValidator>(
                         text: $password,
                         placeholder: "Nhập mật khẩu",
                         isPwd: true,
@@ -205,7 +205,13 @@ public struct GoIdAuthenViewV2: View {
         let validation = usernameValidator.validate(text: username)
         let validationPwd = pwdValidator.validate(text: password)
         if validation.isValid == false || validationPwd.isValid == false {
-
+            var str: String = ""
+            if !validation.errorMessage.isEmpty {
+                str = validation.errorMessage
+            }else if !validationPwd.errorMessage.isEmpty {
+                str = validationPwd.errorMessage
+            }
+            AlertDialog.instance.show(message:str)
             return
         }
         if rememberMe {

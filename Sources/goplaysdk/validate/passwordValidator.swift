@@ -47,3 +47,31 @@ class PasswordValidator: TextFieldValidator {
         return (true, "")
     }
 }
+
+
+class PasswordSimpleValidator: TextFieldValidator {
+    let minLength: Int
+    let maxLength: Int
+    init(minLength: Int = 6, maxLength: Int = 20) {
+            self.minLength = minLength
+            self.maxLength = maxLength
+        }
+
+    
+
+    override func validate(text: String) -> (isValid: Bool, errorMessage: String) {
+
+        // 1️⃣ Check length
+        guard text.count >= minLength && text.count <= maxLength else {
+            return (
+                false,
+                "Mật khẩu phải dài từ \(minLength) đến \(maxLength) ký tự."
+            )
+        }
+
+       
+        // ✅ Pass tất cả
+        return (true, "")
+    }
+}
+

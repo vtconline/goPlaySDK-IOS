@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'goplaysdk'
-  s.version          = '1.0.24'
+  s.version          = '1.0.25'
   s.summary          = 'GoPlay SDK for iOS'
 
   s.description      = <<-DESC
@@ -19,7 +19,7 @@ Written in Swift & SwiftUI.
 
   s.source           = {
     :git => 'https://github.com/vtconline/goPlaySDK-IOS.git',
-    :tag => 'v1.0.24'
+    :tag => 'v1.0.25'
   }
 
 
@@ -28,14 +28,14 @@ Written in Swift & SwiftUI.
   s.swift_version    = '5.9'
   s.static_framework = true   # 👈 BẮT BUỘC để add firebase
   s.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
+    # 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
     'IPHONEOS_DEPLOYMENT_TARGET' => '13.0'
 
     # 'MACH_O_TYPE' => 'mh_dylib'
   }
   # s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
    s.user_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
+    # 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
     'IPHONEOS_DEPLOYMENT_TARGET' => '13.0'
   }
 

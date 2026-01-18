@@ -15,7 +15,7 @@ public struct GoIdAuthenView: View {
     @State private var isShowingSafari = false
 
     @StateObjectCompat private var usernameValidator = UsernameValidator()
-    @StateObjectCompat private var pwdValidator = PasswordValidator()
+    @StateObjectCompat private var pwdValidator = PasswordSimpleValidator()
 
     let enalbeSocialLogin: Bool
 
@@ -42,7 +42,7 @@ public struct GoIdAuthenView: View {
             )
             .keyboardType(.asciiCapable)
 
-            GoTextField<PasswordValidator>(
+            GoTextField<PasswordSimpleValidator>(
                 text: $password,
                 placeholder: "Enter Password",
                 isPwd: true,
