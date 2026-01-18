@@ -27,6 +27,17 @@ public struct SelectLoginType: View {
                 backgroundColor: AppTheme.Colors.primary
             )
             GoNavigationLink(
+                text: "ĐĂNG NHẬP GOID New",
+                destination:GoIdAuthenViewV2(enalbeSocialLogin: false),
+                assetImageName: "logo_goplay",
+
+                imageSize: CGSize(width: 24, height: 24),
+                font: .system(size: 16, weight: .semibold),
+                textColor: .white,
+                backgroundColor: AppTheme.Colors.primary
+            )
+            
+            GoNavigationLink(
                 text: "ĐĂNG NHẬP GOID",
                 destination: GoIdAuthenView(enalbeSocialLogin: false),
                 assetImageName: "logo_goplay",

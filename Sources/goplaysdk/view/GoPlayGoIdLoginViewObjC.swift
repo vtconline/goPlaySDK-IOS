@@ -12,15 +12,15 @@ public struct GoPlayGoIdLoginViewObjC: View {
     public var body: some View {
         // Kiểm tra nếu là iOS 16 trở lên, dùng NavigationStack
         VStack(spacing: 0) {
-            HeaderView()
+//            HeaderView()
             if #available(iOS 16.0, *) {
                 NavigationStack {
-                    GoIdAuthenView(enalbeSocialLogin: haveSocialLogin)
+                    GoIdAuthenViewV2(enalbeSocialLogin: haveSocialLogin)
                 }
             } else {
                 // Nếu iOS < 16, dùng NavigationView
                 NavigationView {
-                    GoIdAuthenView(enalbeSocialLogin: haveSocialLogin)
+                    GoIdAuthenViewV2(enalbeSocialLogin: haveSocialLogin)
                 }
             }
         }

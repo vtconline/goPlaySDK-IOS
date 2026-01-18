@@ -10,16 +10,22 @@ public struct ResetPwdView: View {
 
     @StateObject private var passwordValidator = PasswordValidator()
     @StateObject private var rePasswordValidator = PasswordValidator()
+    
+    private var phoneNumber : String = ""
+    private var goId : Int = 0
 
     let goPlaySession: GoPlaySession?
     let userProfile: UserProfile?
-    public init() {
+//    let userProfile: CheckAuthenUserInfo?
+    public init(goId: Int, phoneNumber: String) {
+        self.goId = goId
+        self.phoneNumber = phoneNumber
         userProfile = AuthManager.shared.currentUser()
         goPlaySession = AuthManager.shared.currentSesion()
     }
     var spaceOriented: CGFloat {
         // Dynamically set space based on the device orientation
-        return DeviceOrientation.shared.isLandscape ? 10 : 1
+        return DeviceOrientation.shared.isLandscape ? 1 : 10
     }
 
     var paddingVertialOriented: CGFloat {
@@ -47,7 +53,7 @@ public struct ResetPwdView: View {
 
         VStack(alignment: .center, spacing: spaceOriented) {
             Text(
-                "Vui lòng sử dụng SĐT \(userProfile?.phone ?? "") để lấy mã OTP khôi phục mật khẩu bằng cách:"
+                "Vui lòng sử dụng SĐT \(self.phoneNumber) để lấy mã OTP khôi phục mật khẩu bằng cách:"
             )
             .foregroundColor(.black)
             .padding(.horizontal, 10)
@@ -84,12 +90,14 @@ public struct ResetPwdView: View {
             //                .frame(height: paddingVertialOriented)
             Text("Nhập mã OTP")
                 .foregroundColor(.black)
-            //            Spacer()
-            //                .frame(height: paddingVertialOriented)
             OTPInputView(otp: $otp)
-            //            Spacer()
-            //                .frame(height: paddingVertialOriented)
-            GoButton(text: "XÁC NHẬN", action: resetPassword)
+            
+            
+            GoButton(color: .black,  action: resetPassword){
+                Text("Xác nhận")
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+            }
 
             Spacer()
         }
@@ -171,7 +179,11 @@ public struct ResetPwdView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
                 .listRowSeparator(.hidden)
                        .listRowBackground(Color.clear)
-            GoButton(text: "XÁC NHẬN", action: resetPassword)
+            GoButton(color: .black,  action: resetPassword){
+                Text("Xác nhận")
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+            }
                 .frame(maxWidth: .infinity, alignment: .center)
                 .listRowSeparator(.hidden)
                 .listRowInsets(
@@ -189,7 +201,7 @@ public struct ResetPwdView: View {
     var smsSyntaxView: some View {
         return VStack(alignment: .center, spacing: spaceOriented) {
 
-            Text("GO OTP \(String(goPlaySession?.userId ?? 0)) ")
+            Text("GO OTP \(String(self.goId ?? 0)) ")
                 .foregroundColor(.blue)
                 + Text("gửi ")
                 .foregroundColor(.black)

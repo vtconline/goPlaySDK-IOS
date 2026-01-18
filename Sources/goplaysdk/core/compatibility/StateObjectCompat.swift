@@ -29,6 +29,17 @@ public struct StateObjectCompat<ObjectType: ObservableObject>: DynamicProperty {
             return observedObject
         }
     }
+    
+    public var projectedValue: ObservedObject<ObjectType>.Wrapper {
+//        if #available(iOS 14.0, *) {
+//            return .constant(_stateObject.projectedValue)
+//        } else {
+//            return _observedObject.projectedValue
+//        }
+        return _observedObject.projectedValue
+//        _stateObject.projectedValue
+//        _observedObject.projectedValue
+    }
 
     // ❌ KHÔNG projectedValue
 }

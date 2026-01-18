@@ -78,6 +78,8 @@ public struct GoButton<Content: View>: View {
                 )
         }
         .contentShape(Rectangle())
+//        .buttonStyle(.PrimitiveButtonStyle)
+
     }
 }
 

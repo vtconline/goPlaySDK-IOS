@@ -38,7 +38,7 @@ struct ResponsiveView<PortraitContent: View, LandscapeContent: View>: View {
             .frame(maxWidth: .infinity, alignment: .center)
             
         }
-        .edgesIgnoringSafeArea(.all) // Optional: To make the view fill the screen
+//        .edgesIgnoringSafeArea(.all) // Optional: To make the view fill the screen
     }
 }
 

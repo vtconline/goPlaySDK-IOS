@@ -4,7 +4,7 @@ public struct GuestLoginUpdateProfileViewObjC: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            HeaderView()
+//            HeaderView()
             if #available(iOS 16.0, *) {
                 NavigationStack {
                     GuestLoginUpdateProfileView()

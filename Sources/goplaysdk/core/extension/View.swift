@@ -76,7 +76,7 @@ extension View {
         #endif
     }
     
-
+    @ViewBuilder
     public func navigateToDestination(navigationManager: NavigationManager)
         -> some View
     {
@@ -96,7 +96,8 @@ extension View {
                             }
                         )
                     ) {
-                        EmptyView()
+                        Text("navigate")
+//                        EmptyView()
                     }
                 } else {
                     EmptyView()
@@ -136,6 +137,8 @@ extension View {
         switch destination {
         case .goIdAuthenView:
             return AnyView(GoIdAuthenView())
+        case .goIdAuthenViewV2:
+            return AnyView(GoIdAuthenViewV2())
         case .userInfoView:
             return AnyView(RegisterView())
         case .updateGuestInfoView:
@@ -150,6 +153,7 @@ extension View {
 // Move NavigationDestination outside of NavigationManager
 public enum NavigationDestination {
     case goIdAuthenView
+    case goIdAuthenViewV2
     case userInfoView
     case updateGuestInfoView
 }
@@ -162,9 +166,11 @@ public class NavigationManager: ObservableObject {
 
     // Navigation functions to set the destination
     public func navigate(to destination: NavigationDestination) {
-
-        self.destination = destination
-        path.append(destination)
+        DispatchQueue.main.async {
+            self.destination = destination
+            self.path.append(destination)
+        }
+        
     }
     public func popToRoot() {
         path.removeAll()

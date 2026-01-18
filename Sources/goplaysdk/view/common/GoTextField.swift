@@ -3,6 +3,7 @@ import SwiftUI
 
 struct GoTextField<Validator: TextFieldValidator>: View {
     @Binding var text: String
+    @Binding var isDisabled: Bool
 
     @ObservedObject var validator: Validator  // 👈 Use validator binding
     @State private var isPasswordVisible = false
@@ -27,6 +28,7 @@ struct GoTextField<Validator: TextFieldValidator>: View {
         widthBtn: CGFloat = 300,
         leftIconName: String? = nil,
         isSystemIcon: Bool = true,
+        isDisabled: Binding<Bool> = .constant(false),
         keyBoardFocused: Binding<Bool> = .constant(false),
         keyboardType: UIKeyboardType = .default
     ) {
@@ -37,12 +39,13 @@ struct GoTextField<Validator: TextFieldValidator>: View {
         self.validator = validator
         self.isPwd = isPwd
         self.widthBtn = widthBtn
+        self._isDisabled = isDisabled
         self._keyBoardFocused = keyBoardFocused  // 🟢 Bind the passed in `keyBoardFocused` state
         self.keyboardType = keyboardType
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack {
+            HStack(spacing: 0) {
                 // Optional Left Icon (from assets in the main bundle)
                 if isSystemIcon {
                     if let icon = leftIconName {
@@ -88,9 +91,11 @@ struct GoTextField<Validator: TextFieldValidator>: View {
                     .font(.system(size: 16))
                     .padding(.vertical, 12)
                     .padding(.trailing, 12)
+                    .padding(.leading, leftIconName == nil ? 12 : 4)
                     .autocorrectionDisabled(true)
                     .autocapitalization(.none)
                     .keyboardType(keyboardType)
+                    .disabled(isDisabled)
                     //                        .focused($isFocused)
                 } else {
                     //                    TextField(placeholder, text: $text)
@@ -103,11 +108,13 @@ struct GoTextField<Validator: TextFieldValidator>: View {
 
                         TextField("", text: $text)
                             .foregroundColor(Color.black)
+                            .disabled(isDisabled)
                     }
                     .font(.system(size: 16))
                     .foregroundColor(Color.black)
                     .padding(.vertical, 12)
                     .padding(.trailing, 12)
+                    .padding(.leading, leftIconName == nil ?12 : 4)
                     .autocorrectionDisabled(true)
                     .autocapitalization(.none)
                     .keyboardType(keyboardType)
@@ -136,7 +143,7 @@ struct GoTextField<Validator: TextFieldValidator>: View {
             //                    .stroke(Color.gray.opacity(0.1), lineWidth: 2))
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white)
+                    .fill(isDisabled ? Color.gray.opacity(0.1) :  Color.white)
             )
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .overlay(  // Add border matching the clip shape

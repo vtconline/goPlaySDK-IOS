@@ -20,4 +20,5 @@ public enum GoApi {
     static let oauthToken = "authen-service/oauth/token"
     static let verifyPhone = "authen-service/users/v3/update/verifyphone"
     static let userRename = "authen-service/users/update/rename"
+    
 }

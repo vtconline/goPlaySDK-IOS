@@ -8,15 +8,25 @@ public struct RegisterView: View {
 
     @State private var userName = ""
     @State private var passWord = ""
-    @State private var phoneNumber = ""
-    @State private var email = ""
+    @State private var rePassWord = ""
+    
+    @State private var showUIUpdatePhone = false
+    
+    
+    @State private var usernameLock = false
 
     @StateObjectCompat private var userNameValidator = UsernameValidator()
     @StateObjectCompat private var passwordValidator = PasswordValidator()
-    @StateObjectCompat private var phoneNumberValidator = PhoneValidator()
-    @StateObjectCompat private var emailValidator = EmailValidator()
+    @StateObjectCompat private var rePassWordValidator = PasswordValidator()
+    /*@StateObjectCompat private var emailValidator = EmailValidator()*/
 
-    public init() {}
+
+
+    public init(user: String = "") { 
+        _userName = State(initialValue: user)
+       _usernameLock =  State(initialValue: !user.isEmpty)
+    }
+
     var spaceOriented: CGFloat {
         // Dynamically set space based on the device orientation
         return DeviceOrientation.shared.isLandscape ? 10 : 10
@@ -25,15 +35,23 @@ public struct RegisterView: View {
     public var body: some View {
 
         VStack(alignment: .center, spacing: spaceOriented) {
-
+            NavigationLink(
+                            destination: PhoneActiveView(),
+                            isActive: $showUIUpdatePhone,
+                            label: {
+                                EmptyView()
+                            }
+                        )
             GoTextField<UsernameValidator>(
                 text: $userName, placeholder: "Nhập tài khoản", isPwd: false,
                 validator: userNameValidator, leftIconName: "ic_user_focused",
-                isSystemIcon: false
+                isSystemIcon: false, isDisabled: $usernameLock
             )
             .keyboardType(.default)
             .padding(.horizontal, 16)
 
+            //Mật khẩu gồm ít nhất 1 chữ thường, 1 số, 1 viết hoa
+//            Ít nhất 8 ký tự
             GoTextField<PasswordValidator>(
                 text: $passWord, placeholder: "Nhập mật khẩu", isPwd: true,
                 validator: passwordValidator, leftIconName: "ic_lock_focused",
@@ -42,25 +60,29 @@ public struct RegisterView: View {
             .keyboardType(.default)
             .padding(.horizontal, 16)
 
-            GoTextField<PhoneValidator>(
-                text: $phoneNumber, placeholder: "Số ĐT", isPwd: false,
-                validator: phoneNumberValidator, leftIconName: "ic_phone",
-                isSystemIcon: false, keyboardType: .numberPad
+            GoTextField<PasswordValidator>(
+                text: $rePassWord, placeholder: "Nhập lại mật khẩu", isPwd: true,
+                validator: rePassWordValidator, leftIconName: "ic_lock_focused",
+                isSystemIcon: false
             )
             .padding(.horizontal, 16)
+            
+            Text("Mật khẩu bao gồm:\n- Mật khẩu gồm ít nhất 1 chữ thường, 1 số, 1 viết hoa\n- Ít nhất 8 ký tự")
+//                .fontWeight(.semibold)
+                .font(.system(size: 14))
+                .foregroundColor(.black)
+                .padding(.vertical, 10)
+                .frame(maxWidth: 300, alignment: .leading)
+           
 
-            GoTextField<EmailValidator>(
-                text: $email, placeholder: "Email", isPwd: false, validator: emailValidator,
-                leftIconName: "ic_email", isSystemIcon: false, keyboardType: .emailAddress
-            )
-
-            .padding(.horizontal, 16)
-
-            GoButton(text: "ĐĂNG KÝ", action: {
-                Task { @MainActor in
-                        await submitLoginPhone()
-                    }
-            })
+            GoButton(color: .black, action: {
+                 submitRegister()
+                
+            }){
+                Text("Đăng ký")
+                .font(.system(size: 16))
+                .foregroundColor(.white)
+            }
 
             Spacer()
         }
@@ -79,15 +101,29 @@ public struct RegisterView: View {
 
     }
 
-    private func submitLoginPhone() async {
-        guard !userName.isEmpty, !passWord.isEmpty else {
+    private func submitRegister()  {
+        guard !userName.isEmpty, !passWord.isEmpty, !rePassWord.isEmpty else {
             AlertDialog.instance.show(message: "Vui lòng nhập tài khoản và mật khẩu")
+            return
+        }
+        guard passWord == rePassWord else {
+            AlertDialog.instance.show(message: "2 mật khẩu không khớp")
             return
         }
         let userValidation = userNameValidator.validate(text: userName)
         let pwdValidation = passwordValidator.validate(text: passWord)
+        let rePwdValidation = rePassWordValidator.validate(text: passWord)
 
-        if userValidation.isValid == false || pwdValidation.isValid == false {
+        if userValidation.isValid == false || pwdValidation.isValid == false || rePwdValidation.isValid == false {
+            var str: String = ""
+            if !userValidation.errorMessage.isEmpty {
+                str = userValidation.errorMessage
+            }else if !pwdValidation.errorMessage.isEmpty {
+                str = pwdValidation.errorMessage
+            }else if !rePwdValidation.errorMessage.isEmpty {
+                str = rePwdValidation.errorMessage
+            }
+            AlertDialog.instance.show(message:str)
             return
         }
         LoadingDialog.instance.show()
@@ -96,54 +132,40 @@ public struct RegisterView: View {
         var bodyData: [String: Any] = [
             "username": userName,
             "password": passWord,
+//            "mobile":"09xxx"
         ]
-        if !phoneNumber.isEmpty {
-            let phoneValidation = phoneNumberValidator.validate(text: phoneNumber)
-            if phoneValidation.isValid == false {
+        
+        Task{
+            await ApiService.shared.post(path: GoApi.oauthRegister, body: bodyData) { result in
+               
+                    LoadingDialog.instance.hide()
 
-                return
-            }
-            bodyData["mobile"] = phoneNumber
-        }
-        if !email.isEmpty {
-            let emailValidation = emailValidator.validate(text: email)
-            if emailValidation.isValid == false {
-                return
-            }
-            bodyData["email"] = email
+                    switch result {
+                    case .success(let data):
+                        // Handle successful response
+
+                        // Parse the response if necessary
+                        if let jsonResponse = try? JSONSerialization.jsonObject(
+                            with: data, options: []),
+                            let responseDict = jsonResponse as? [String: Any]
+                        {
+                            // print("onRegisterResponse Response: \(responseDict)")
+                            onRegisterResponse(response: responseDict)
+                            
+                        }
+
+                    case .failure(let error):
+                        // Handle failure response
+                        //                    print("Error: \(error.localizedDescription)")
+                        AlertDialog.instance.show(message: error.localizedDescription)
+                    }
+                
+              
+          }
         }
 
         // Now, you can call the `post` method on ApiService
-        
-             await ApiService.shared.post(path: GoApi.oauthRegister, body: bodyData) { result in
-                 Task{@MainActor in
-                     LoadingDialog.instance.hide()
-
-                     switch result {
-                     case .success(let data):
-                         // Handle successful response
-
-                         // Parse the response if necessary
-                         if let jsonResponse = try? JSONSerialization.jsonObject(
-                             with: data, options: []),
-                             let responseDict = jsonResponse as? [String: Any]
-                         {
-                             // print("onRegisterResponse Response: \(responseDict)")
-                             onRegisterResponse(response: responseDict)
-                             
-                         }
-
-                     case .failure(let error):
-                         // Handle failure response
-                         //                    print("Error: \(error.localizedDescription)")
-                         AlertDialog.instance.show(message: error.localizedDescription)
-                     }
-                 }
-               
-           }
-        
-       
-             
+    
         
     }
 
@@ -157,21 +179,26 @@ public struct RegisterView: View {
 
             if apiResponse.isSuccess() {
 
-                print(
-                    "onRegisterResponse onRequestSuccess userName: \(apiResponse.data?.accessToken ?? "")"
-                )
-                guard apiResponse.data != nil else {
-                    AlertDialog.instance.show(message: "Không đọc được TokenData")
-                    return
+                if(apiResponse.isMustActive()){
+                    showUIUpdatePhone = true
+                }else{
+                    guard apiResponse.data != nil else {
+                        AlertDialog.instance.show(message: "Không đọc được TokenData")
+                        return
+                    }
+                    let tokenData: TokenData = apiResponse.data!
+                    if let session = GoPlaySession.deserialize(data: tokenData) {
+                        UserDefaults.standard.set(session.userName, forKey: GoConstants.savedUserName)
+                        AuthManager.shared.handleLoginSuccess(session)
+                        hostingController?.close()
+                    } else {
+                        AlertDialog.instance.show(message: "Không đọc được Token")
+                    }
                 }
-                let tokenData: TokenData = apiResponse.data!
-                if let session = GoPlaySession.deserialize(data: tokenData) {
-                    UserDefaults.standard.set(session.userName, forKey: GoConstants.savedUserName)
-                    AuthManager.shared.handleLoginSuccess(session)
-                    hostingController?.close()
-                } else {
-                    AlertDialog.instance.show(message: "Không đọc được Token")
-                }
+                
+                
+                
+                
 
             } else {
                 message = apiResponse.message

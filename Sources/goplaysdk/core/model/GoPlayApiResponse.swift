@@ -2,6 +2,7 @@ public struct GoPlayApiResponse<T: Codable>: Codable {
     let code: Int
     let message: String
     let data: T?
+    let mustActive: Int?
 
     func isSuccess() -> Bool {
         return code == GoErrorCode.Authen.ok.rawValue
@@ -9,6 +10,10 @@ public struct GoPlayApiResponse<T: Codable>: Codable {
 
     func haveError() -> Bool {
         return code != 0
+    }
+    
+    func isMustActive() -> Bool {
+        return mustActive != nil && mustActive == 1
     }
 
     func tokenExpired() -> Bool {
