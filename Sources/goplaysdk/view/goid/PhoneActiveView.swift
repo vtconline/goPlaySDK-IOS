@@ -18,7 +18,7 @@ public struct PhoneActiveView: View {
 
     @StateObjectCompat private var passwordValidator = PasswordValidator()
     @StateObjectCompat private var phoneNumberValidator = PhoneValidator()
-    @StateObjectCompat private var emailValidator = EmailValidator()
+    @StateObjectCompat private var otpValidator = OTPValidator()
 
     public init(onBack: @escaping () -> Void = {}) {
         self.onBack = onBack
@@ -35,6 +35,8 @@ public struct PhoneActiveView: View {
             } else {
                 verifyOTPview()
             }
+            OTPNoteView()
+                .frame(maxWidth: DeviceOrientation.shared.isLandscape ? .infinity : 300, alignment: .leading)
         }
         .observeOrientation()  // Apply the modifier to detect orientation changes
         .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
@@ -76,9 +78,7 @@ public struct PhoneActiveView: View {
                 .font(.system(size: 16))
                 .foregroundColor(.white)
         }
-
         Spacer()
-        //        }
 
     }
 
@@ -95,7 +95,7 @@ public struct PhoneActiveView: View {
         Text("\(otpRemainTxt)")
             .foregroundColor(.red)
         Text(
-            "OTP chỉ có giá trị trong vòng \(otpTimeTotal/60):\(otpTimeTotal%60) phút"
+            "OTP chỉ có giá trị trong vòng \(String(format: "%02d:%02d",otpTimeTotal/60,otpTimeTotal%60)) phút"
         )
         .foregroundColor(.black)
 
@@ -114,15 +114,24 @@ public struct PhoneActiveView: View {
             AlertDialog.instance.show(message: "SĐT không được bỏ trống")
             return
         }
+//        if(GoPlaySDK.instance.isSandBox){
+//            print("use https://sandbox.goplay.vn/thong-tin-testt.html để lấy otp")
+//            let testData: [String: Any] = [:]
+//            checkOtpResponse(response: testData)
+//            return
+//        }
+        
         LoadingDialog.instance.show()
         Task {
             let bodyData: [String: Any] = [
-                "otpname": phoneNumber,
-                "loginType": LoginType.phone.rawValue,
+                "mobile": phoneNumber,
+                
             ]
             await ApiService.shared.post(
-                path: GoApi.oauthGetAuthenOtp,
-                body: bodyData
+                path: GoApi.oauthPhoneGetOtp,
+                body: bodyData,
+                sign: true,
+                payloadType: GoPayloadType.userInfo
             ) { result in
 
                 LoadingDialog.instance.hide()
@@ -161,7 +170,19 @@ public struct PhoneActiveView: View {
                 withJSONObject: response,
                 options: []
             )
-            let apiResponse = try JSONDecoder().decode(
+            let apiResponse : GoPlayApiResponse<Int>
+            
+//            if(GoPlaySDK.instance.isSandBox){
+//                apiResponse = GoPlayApiResponse<Int>.createTest(
+//                    data: 300
+//                )
+//            }else{
+//                apiResponse = try JSONDecoder().decode(
+//                    GoPlayApiResponse<Int>.self,
+//                    from: jsonData
+//                )
+//            }
+            apiResponse = try JSONDecoder().decode(
                 GoPlayApiResponse<Int>.self,
                 from: jsonData
             )
@@ -170,7 +191,7 @@ public struct PhoneActiveView: View {
             var haveError = true
 
             if apiResponse.isSuccess() {
-                //                print("checkOtpResponse onRequestSuccess data: \(apiResponse.data ?? 0)")
+                //print("checkOtpResponse onRequestSuccess data: \(apiResponse.data ?? 0)")
                 step = 1
                 let timeCountDown: Int = (apiResponse.data as? Int) ?? 0
                 otpTimeTotal = timeCountDown
@@ -186,9 +207,6 @@ public struct PhoneActiveView: View {
                             onTick: { secondsLeft in
                                 let minutes = secondsLeft / 60
                                 let seconds = secondsLeft % 60
-                                print(
-                                    "checkOtpResponse tick data: \(minutes) \(seconds)"
-                                )
                                 otpRemainTxt = String(
                                     format: "%02d:%02d",
                                     minutes,
@@ -197,7 +215,7 @@ public struct PhoneActiveView: View {
 
                             },
                             onFinish: {
-                                print("onFinish tick: ")
+//                                print("onFinish tick: ")
                                 step = 0
                                 otpRemainTxt = ""
                             }
@@ -225,16 +243,19 @@ public struct PhoneActiveView: View {
     }
 
     private func requestVerifyOtp() {
-        guard !phoneNumber.isEmpty else {
+        guard !otpNumber.isEmpty else {
             AlertDialog.instance.show(
                 message: "Vui lòng nhập OTP"
             )
             return
         }
         //        let userValidation = userNameValidator.validate(text: userName)
-        let phoneValidation = phoneNumberValidator.validate(text: phoneNumber)
+        let otpValidation = otpValidator.validate(text: otpNumber)
 
-        if phoneValidation.isValid == false {
+        if otpValidation.isValid == false {
+            AlertDialog.instance.show(
+                message: otpValidation.errorMessage ?? "Vui lòng nhập đủ OTP"
+            )
             return
         }
         LoadingDialog.instance.show()
@@ -243,28 +264,23 @@ public struct PhoneActiveView: View {
         //ios
         //    apple login swift sample dev    goId: Ma xac thuc cua ban la: 298604, MKC2 cua ban la: 124A2805. MKC2 chi co tac dung sau khi xac thuc.
         var bodyData: [String: Any] = [
-            //            "oldAccountName": KeychainHelper.loadCurrentSession()?.userName
-            //                ?? "",
-            //            "newAccountName": userName,
-            //            "password": otpNumber,
-            //            "passwordmd5": Utils.md5(otpNumber),
+            "mobile": phoneNumber,
             "otp": otpNumber
-                //            "jwt":KeychainHelper.loadCurrentSession()?.accessToken
         ]
         //test
-        var params222 = GoApiService.shared.getuserParams(nil)
-        bodyData = bodyData.merging(params222 ?? [:]) { current, _ in current }
-        //test
+//        var params222 = GoApiService.shared.getuserParams(nil)
+//        bodyData = bodyData.merging(params222 ?? [:]) { current, _ in current }
+//        //test
+//
+//        var bodyMerge = Utils.getPartnerParams()
+//        bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
 
-        var bodyMerge = Utils.getPartnerParams()
-        bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
-
-        print("oApi.phoneactive params \(bodyData)")
+//        print("oApi.phoneactive params \(bodyData)")
         Task {
             await ApiService.shared.post(
-                path: GoApi.verifyPhone,  //GoApi.verifyPhone GoApi.userRename
+                path: GoApi.oauthPhoneActiveOtp,  //GoApi.verifyPhone GoApi.userRename
                 body: bodyData,
-                sign: false
+//                sign: false
             ) { result in
 
                 LoadingDialog.instance.hide()

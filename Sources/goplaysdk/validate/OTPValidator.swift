@@ -2,7 +2,7 @@
 //  passwordValidator.swift
 //  goplaysdk
 //
-//  Created by Ngô Đồng on 24/4/25.
+//  Created on 24/4/25.
 //
 
 class OTPValidator: TextFieldValidator {
@@ -20,7 +20,7 @@ class OTPValidator: TextFieldValidator {
         errorMessage = ""
         guard text.count >= minLength && text.count <= maxLength else {
             isValid = false
-            errorMessage = "Mật khẩu phải dài từ \(minLength) đến \(maxLength) ký tự."
+            errorMessage = "OTP phải dài từ \(minLength) đến \(maxLength) ký tự."
             return (isValid, errorMessage)
         }
         return (isValid,errorMessage)

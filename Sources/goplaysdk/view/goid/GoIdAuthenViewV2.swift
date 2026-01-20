@@ -291,25 +291,27 @@ public struct GoIdAuthenViewV2: View {
                 print(
                     "onLoginResponse onRequestSuccess mustActive \(apiResponse.isMustActive()) token: \(apiResponse.data?.accessToken ?? "")"
                 )
-                if(apiResponse.isMustActive()){
-//                    navigationManager.navigate(
-//                        to: NavigationDestination.updateGuestInfoView)
-                    showUIUpdatePhone = true
-                }else{
-                    if apiResponse.data != nil {
-                        let tokenData: TokenData = apiResponse.data!
-                        if let session = GoPlaySession.deserialize(data: tokenData)
-                        {
-                            AuthManager.shared.handleLoginSuccess(session)
+                if apiResponse.data != nil {
+                    let tokenData: TokenData = apiResponse.data!
+                    if let session = GoPlaySession.deserialize(data: tokenData)
+                    {
+                        let isMustActive = true// GoPlaySDK.instance.isSandBox || apiResponse.isMustActive()
+                        AuthManager.shared.handleLoginSuccess(session, !isMustActive)
+                        if(isMustActive){
+                            //active xong sẽ noti envet login done sau
+                            showUIUpdatePhone = true
+                        }else{
+                            //close current view popup
                             hostingController?.close()
-                        } else {
-                            AlertDialog.instance.show(
-                                message: "Không đọc được Token"
-                            )
                         }
+                        
+                    } else {
+                        AlertDialog.instance.show(
+                            message: "Không đọc được Token"
+                        )
                     }
-                    
                 }
+                
                 
 
             } else {

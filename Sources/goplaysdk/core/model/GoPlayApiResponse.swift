@@ -3,6 +3,20 @@ public struct GoPlayApiResponse<T: Codable>: Codable {
     let message: String
     let data: T?
     let mustActive: Int?
+    
+    static func createTest(
+            code: Int = GoErrorCode.Authen.ok.rawValue,
+            message: String = "success",
+            data: T? = nil,
+            mustActive: Int? = 0
+        ) -> GoPlayApiResponse<T> {
+            return GoPlayApiResponse(
+                code: code,
+                message: message,
+                data: data,
+                mustActive: mustActive
+            )
+        }
 
     func isSuccess() -> Bool {
         return code == GoErrorCode.Authen.ok.rawValue

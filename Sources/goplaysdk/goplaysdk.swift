@@ -15,6 +15,7 @@ import UIKit
     }
 
     public var goPlayConfig: GoPlayConfig? = nil
+    public var isSandBox: Bool = false
 
     private var _isGetConfig: Bool = false
     private var isManualClick: Bool = false
@@ -32,6 +33,7 @@ import UIKit
         _ clientId: String,
         _ clientSecret: String
     ) {
+        self.isSandBox = isSandBox
         ApiService.shared.initWithKey(isSandBox, clientId, clientSecret)
         Task{
             await self.getRemoteConfig()
@@ -59,7 +61,7 @@ import UIKit
         }
 
         let controller = GoPlayHostingController(rootView: view)  // UIHostingController(rootView: view)
-        //ensure fullscreen
+        //ensure fullscreen use .fullScreen
         controller.modalPresentationStyle = .pageSheet
 
         controller.rootView = AnyView(

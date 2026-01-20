@@ -40,7 +40,7 @@ public class AuthManager: NSObject, @unchecked Sendable {
     }
 
     /// Call when login/signup succeeded
-    public func handleLoginSuccess(_ session: GoPlaySession)  {
+    public func handleLoginSuccess(_ session: GoPlaySession, _ notiEvent: Bool = true)  {
         // 1. Save tokens
          authStorage.saveCurrentSession(session)
         
@@ -54,12 +54,12 @@ public class AuthManager: NSObject, @unchecked Sendable {
 
         // 2. Save user profile
 //        userStore.save(response.user)
-        
-        AuthService.shared.postEventLogin(
-            session: session,
-            errorStr: nil
-        )
-
+        if(notiEvent){
+            AuthService.shared.postEventLogin(
+                session: session,
+                errorStr: nil
+            )
+        }
     }
     
     public func handleLoginError(_ apiResponse: GoPlayApiResponse<TokenData>)  {

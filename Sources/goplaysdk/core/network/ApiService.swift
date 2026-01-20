@@ -49,12 +49,12 @@ public class ApiService : @unchecked Sendable {
         self.baseURL = newBaseURL
     }
 
-    func get(path: String, sign: Bool = true, completion: @escaping (Result<Data, Error>) -> Void) async {
-        await request(method: "GET", path: path, sign: sign, completion: completion)
+    func get(path: String, sign: Bool = true,payloadType: Int = GoPayloadType.clientInfo, completion: @escaping (Result<Data, Error>) -> Void) async {
+        await request(method: "GET", path: path, sign: sign, payloadType: payloadType, completion: completion)
     }
 
-    func post(path: String, body: [String: Any], sign: Bool = true, completion: @escaping (Result<Data, Error>) -> Void) async {
-        await request(method: "POST", path: path, body: body, sign: sign, completion: completion)
+    func post(path: String, body: [String: Any], sign: Bool = true, payloadType: Int = GoPayloadType.clientInfo, completion: @escaping (Result<Data, Error>) -> Void) async {
+        await request(method: "POST", path: path, body: body, sign: sign, payloadType: payloadType, completion: completion)
     }
     
  
@@ -64,6 +64,7 @@ public class ApiService : @unchecked Sendable {
         path: String,
         body: [String: Any]? = nil,
         sign: Bool = false,
+        payloadType: Int = GoPayloadType.clientInfo,
         completion: @escaping (Result<Data, Error>) -> Void
     ) async {
         guard let url = URL(string: "\(baseURL)\(path)") else {
@@ -89,7 +90,9 @@ public class ApiService : @unchecked Sendable {
                     bodyMerge = mergedBody
                 }
 //                print("requestBody before jwt \(requestBody)")
-                bodyParams["jwt"] = await generateSignature(data: bodyMerge) ?? ""
+                bodyMerge?["cid"] = clientId
+                bodyMerge?["clientId"] = clientId
+                bodyParams["jwt"] = await generatePayloadWithType(data: bodyMerge, payloadType: payloadType) ?? ""
             } else {
                 
         
@@ -146,8 +149,30 @@ public class ApiService : @unchecked Sendable {
         var sid: Int
         var jdt: String
     }
+    
+    func generateSignature<C: Claims>(
+        claims: C
+    ) async -> String? {
 
-    func generateSignature(data: Any) async -> String? {
+        await initJwtIfNeeded()
+
+        guard let signer = signer else {
+            print("Signer not initialized")
+            return nil
+        }
+
+        do {
+            var jwt = JWT(claims: claims)
+            let signedToken = try jwt.sign(using: signer)
+            print("jwt \(signedToken)")
+            return signedToken
+        } catch {
+            print("JWT signing error: \(error)")
+            return nil
+        }
+    }
+
+    func generatePayloadWithType(data: Any, payloadType: Int = GoPayloadType.clientInfo) async -> String? {
         await initJwtIfNeeded()
 
         guard let signer = signer else {
@@ -167,22 +192,103 @@ public class ApiService : @unchecked Sendable {
             } else {
                 jsonData = String(describing: data)
             }
+            
+            let claims: Claims;
+            switch payloadType {
+            case GoPayloadType.clientInfo:
+                claims = MyClaims(
+                    jti: String(jti),
+                    iss: clientId,
+                    nbf: Int(nbf),
+                    exp: Int(exp),
+                    sid: 0,
+                    jdt: jsonData
+                )
+                break
+            case GoPayloadType.userInfo:
+                let goPlaySession =  AuthManager.shared.currentSesion()
+                claims = PayLoadUserInfo(
+                    sub: clientId,
+    //                aud: "access_token",
+                    exp: Int(exp),
+                    sid: 0,
+                    
+                    aty: UInt8(goPlaySession?.accountType ?? 1),//0: fast play, 1: goID, 2: Facebook, 3: Google, 4: Apple
+                    uid: goPlaySession?.userId ?? 0,
+                    name: goPlaySession?.userName ?? "",
+                    dvId : GoPlayUUID.shared.userUUID,
+                    os : "ios"
+                )
+                break
+            default:
+                claims = MyClaims(
+                    jti: String(jti),
+                    iss: clientId,
+                    nbf: Int(nbf),
+                    exp: Int(exp),
+                    sid: 0,
+                    jdt: jsonData
+                )
+                break
+            }
 
-            let claims = MyClaims(
-                jti: String(jti),
-                iss: clientId,
-                nbf: Int(nbf),
+            
+
+            
+            let signedToken = await generateSignature(claims: claims)
+            return signedToken
+        } catch {
+            
+            return nil
+        }
+    }
+    
+    func generatePayloadUserInfo(data: Any) async -> String? {
+        await initJwtIfNeeded()
+
+        guard let signer = signer else {
+            print("Signer not initialized")
+            return nil
+        }
+
+        let jti = Int64(Date().timeIntervalSince1970 * 1000)
+        let nbf = jti / 1000
+        let exp = nbf + 60
+
+        do {
+            let goPlaySession =  AuthManager.shared.currentSesion()
+            let jsonData: String
+            if let json = try? JSONSerialization.data(withJSONObject: data),
+               let jsonStr = String(data: json, encoding: .utf8) {
+                jsonData = jsonStr
+            } else {
+                jsonData = String(describing: data)
+            }
+            
+            
+
+            let claims : PayLoadUserInfo = PayLoadUserInfo(
+            
+                sub: clientId,
+//                aud: "access_token",
                 exp: Int(exp),
                 sid: 0,
-                jdt: jsonData
+                
+                aty: UInt8(goPlaySession?.accountType ?? 1),//0: fast play, 1: goID, 2: Facebook, 3: Google, 4: Apple
+                uid: goPlaySession?.userId ?? 0,
+                name: goPlaySession?.userName ?? "",
+//                dvId: "DEVICE_ID_001",
+//                os: "iOS",
+//                ip: "127.0.0.1",
+//                sta: 5,
+//                scopes: "sso auth update",
+//                sso: 1
             )
 
             var jwt = JWT(claims: claims)
-            let signedToken = try jwt.sign(using: signer)
-            print("jwt \(signedToken)")
+            let signedToken = await generateSignature(claims: claims)
             return signedToken
         } catch {
-            print("JWT signing error: \(error)")
             return nil
         }
     }

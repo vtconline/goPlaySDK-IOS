@@ -106,14 +106,24 @@ extension View {
         )
     }
     
+//    @ViewBuilder
+//    public func compatNavigationTitle(_ title: String) -> some View {
+//            if #available(iOS 14.0, *) {
+//                self.navigationTitle(title)
+//            } else {
+//                self.navigationBarTitle(title)
+//            }
+//        }
     @ViewBuilder
     public func compatNavigationTitle(_ title: String) -> some View {
-            if #available(iOS 14.0, *) {
-                self.navigationTitle(title)
-            } else {
-                self.navigationBarTitle(title)
-            }
+        if #available(iOS 14.0, *) {
+            self
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)   // 👈 FIX
+        } else {
+            self.navigationBarTitle(title)
         }
+    }
     
     @ViewBuilder
     public func compatToolbar<Content: View>(
