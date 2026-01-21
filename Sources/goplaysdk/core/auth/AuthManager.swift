@@ -46,7 +46,7 @@ public class AuthManager: NSObject, @unchecked Sendable {
         
          GoApiService.shared.getUserInfo(callback: { (user: UserProfile?) in
              if let user {
-                 print("handleLoginSuccess with phone \(user.phone ?? "nil")")
+//                 print("handleLoginSuccess with phone \(user.phone ?? "nil")")
                      self.authStorage.saveUser(user)
                      self.userStore.save(user)
              }

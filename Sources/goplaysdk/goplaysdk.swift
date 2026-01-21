@@ -125,7 +125,7 @@ import UIKit
     public func getRemoteConfig() async {
         await GoApiService.shared.getRemoteConfig(
             success: { (configDict: [String: Any]) in
-                //                print("Config received:", configDict)
+//                print("Config received:", configDict)
                 self._isGetConfig = true
                 do {
                     // Convert Dictionary -> JSON Data
@@ -140,11 +140,10 @@ import UIKit
                         from: jsonData
                     )
 
-                    //print("✅ Config decoded:", self.goPlayConfig)
-                    print(
-                        "✅ Config decoded googleClientId:",
-                        self.goPlayConfig?.googleClientId
-                    )
+//                    print(
+//                        "✅ Config decoded googleClientId:",
+//                        self.goPlayConfig?.googleClientId
+//                    )
                     if self.goPlayConfig != nil
                         && !self.goPlayConfig!.googleClientId.isEmpty
                     {
@@ -174,7 +173,7 @@ import UIKit
         Task{
             await GoApiService.shared.checkDevice(
                 success: { (configDict: [String: Any]) in
-                    print("checkDevice done :", configDict)
+//                    print("checkDevice done :", configDict)
 
                     do {
                         // Convert Dictionary -> JSON Data
@@ -190,9 +189,8 @@ import UIKit
 
                         var message = "Lỗi đăng nhập"
 
-                        print("checkDevice apiResponse", apiResponse)
                         if apiResponse.isSuccess() {
-                            print("checkDevice isSuccess true")
+                            
                             self.logEvent("login_success", ["SUCCESS": "SUCCESS"])
                             if apiResponse.data != nil {
                                 let tokenData: TokenData = apiResponse.data!
@@ -220,10 +218,10 @@ import UIKit
 
                 },
                 failure: { (error: Error) in
-                    print(
-                        "❌ checkDevice request Failed:",
-                        error.localizedDescription
-                    )
+//                    print(
+//                        "❌ checkDevice request Failed:",
+//                        error.localizedDescription
+//                    )
                     self._isGetConfig = true
 
                 }

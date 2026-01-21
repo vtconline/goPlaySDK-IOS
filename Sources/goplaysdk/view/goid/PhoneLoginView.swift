@@ -130,7 +130,7 @@ public struct PhoneLoginView: View {
                 "otpname": phoneNumber,
                 "loginType": LoginType.phone.rawValue,
             ]
-            await ApiService.shared.post(path: GoApi.oauthGetAuthenOtp, body: bodyData) { result in
+            await ApiService.shared.post(path: GoApi.oauthGetAuthenOtp, bodyJwtSign: bodyData) { result in
 
                 LoadingDialog.instance.hide()
 
@@ -143,7 +143,7 @@ public struct PhoneLoginView: View {
                         with: data, options: []),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-                        print("submitGetOtp Response: \(responseDict)")
+//                        print("submitGetOtp Response: \(responseDict)")
                         checkOtpResponse(response: responseDict)
                     }
 
@@ -175,7 +175,7 @@ public struct PhoneLoginView: View {
 
         // Now, you can call the `post` method on ApiService
         Task {
-            await ApiService.shared.post(path: GoApi.oauthCheckAuthenOtp, body: bodyData) {
+            await ApiService.shared.post(path: GoApi.oauthCheckAuthenOtp, bodyJwtSign: bodyData) {
                 result in
 
                 LoadingDialog.instance.hide()
@@ -230,7 +230,7 @@ public struct PhoneLoginView: View {
 
         // Now, you can call the `post` method on ApiService
         Task {
-            await ApiService.shared.post(path: GoApi.oauthLogin, body: bodyData) { result in
+            await ApiService.shared.post(path: GoApi.oauthLogin, bodyJwtSign: bodyData) { result in
 
                 LoadingDialog.instance.hide()
 
@@ -243,7 +243,7 @@ public struct PhoneLoginView: View {
                         with: data, options: []),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-                        print("submitLoginPhone Response: \(responseDict)")
+//                        print("submitLoginPhone Response: \(responseDict)")
                         onLoginResponse(response: responseDict)
                     }
 

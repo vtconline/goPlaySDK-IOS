@@ -123,14 +123,26 @@ public struct PhoneActiveView: View {
         
         LoadingDialog.instance.show()
         Task {
-            let bodyData: [String: Any] = [
+            var bodyData: [String: Any] = [
                 "mobile": phoneNumber,
                 
             ]
+            
+            //test
+//            var params222 = GoApiService.shared.getuserParams(nil)
+//            bodyData = bodyData.merging(params222 ?? [:]) { current, _ in current }
+//            //test
+//            
+//            
+//            var bodyMerge = Utils.getPartnerParams()
+//            bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
+            
+            
+            
             await ApiService.shared.post(
                 path: GoApi.oauthPhoneGetOtp,
                 body: bodyData,
-                sign: true,
+                bodyJwtSign: [:],
                 payloadType: GoPayloadType.userInfo
             ) { result in
 
@@ -147,7 +159,7 @@ public struct PhoneActiveView: View {
                     ),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-                        print("submitGetOtp Response: \(responseDict)")
+//                        print("submitGetOtp Response: \(responseDict)")
                         
                         checkOtpResponse(response: responseDict)
                     }
@@ -280,7 +292,8 @@ public struct PhoneActiveView: View {
             await ApiService.shared.post(
                 path: GoApi.oauthPhoneActiveOtp,  //GoApi.verifyPhone GoApi.userRename
                 body: bodyData,
-//                sign: false
+                bodyJwtSign: [:],
+                payloadType: GoPayloadType.userInfo
             ) { result in
 
                 LoadingDialog.instance.hide()
@@ -296,7 +309,7 @@ public struct PhoneActiveView: View {
                     ),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-                        print("requestVerifyOtp Response: \(responseDict)")
+//                        print("requestVerifyOtp Response: \(responseDict)")
                         onUpdateInfoResponse(response: responseDict)
 
                     }
@@ -319,43 +332,26 @@ public struct PhoneActiveView: View {
                 options: []
             )
             let apiResponse = try JSONDecoder().decode(
-                GoPlayApiResponse<TokenData>.self,
+                GoPlayApiResponse<Int>.self,
                 from: jsonData
             )
 
             var message = "Lỗi OTP"
 
             if apiResponse.isSuccess() {
-
-                print(
-                    "onUpdateInfoResponse onRequestSuccess userName: \(apiResponse.data?.accessToken ?? "")"
-                )
-                guard apiResponse.data != nil else {
-                    AlertDialog.instance.show(
-                        message: "Không đọc được TokenData"
-                    )
-                    return
+                if(AuthManager.shared.currentSesion() != nil){
+                    AuthManager.shared.handleLoginSuccess(AuthManager.shared.currentSesion()!)
                 }
-                let tokenData: TokenData = apiResponse.data!
-                if let session = GoPlaySession.deserialize(data: tokenData) {
-                    KeychainHelper.save(
-                        key: GoConstants.goPlaySession,
-                        data: session
-                    )
-                    AuthManager.shared.handleLoginSuccess(session)
+                
 
-                    hostingController?.close()
-                } else {
-                    AlertDialog.instance.show(message: "Không đọc được Token")
-                }
-
+                hostingController?.close()
             } else {
                 message = apiResponse.message
                 AlertDialog.instance.show(message: apiResponse.message)
             }
 
         } catch {
-            print("error linking \(error)")
+            print("error OTP \(error)")
             AlertDialog.instance.show(message: error.localizedDescription)
         }
     }

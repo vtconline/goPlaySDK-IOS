@@ -39,12 +39,11 @@ public class GoApiService: @unchecked Sendable {
     public func getRemoteConfig(success: @MainActor @escaping ([String: Any]) -> Void, failure:@MainActor @escaping (_ error : Error ) -> Void) async {
 //        LoadingDialog.instance.show()
         // This would be a sample data payload to send in the POST request
-        var bodyData: [String: Any] = Utils.getPartnerParams()
+        
     
             await ApiService.shared.post(
                 path: GoApi.oauthConfig,
-                body: bodyData,
-                sign: true
+                bodyJwtSign: [:]
             ) { result in
 
 //                LoadingDialog.instance.hide()
@@ -60,7 +59,7 @@ public class GoApiService: @unchecked Sendable {
                             print("❌ getRemoteConfig JSON is not a dictionary")
                             return
                         }
-                        print("✅ getRemoteConfig Parsed Response:", responseDict)
+//                        print("✅ getRemoteConfig Parsed Response:", responseDict)
                         
                         Task { @MainActor in
                             success(responseDict)
@@ -121,7 +120,7 @@ public class GoApiService: @unchecked Sendable {
         // Now, you can call the `post` method on ApiService
         Task { @MainActor in
             let bodyData: [String: Any] =  getuserParams(nil)
-            await ApiService.shared.post(path: GoApi.getInfo, body: bodyData, sign: false) { result in
+            await ApiService.shared.post(path: GoApi.getInfo, body: bodyData) { result in
 
                 LoadingDialog.instance.hide()
 
@@ -134,10 +133,10 @@ public class GoApiService: @unchecked Sendable {
                             with: data, options: []),
                             let responseDict = jsonResponse as? [String: Any]
                         {
-                            print("submitLoginPhone Response: \(responseDict)")
+//                            print("submitLoginPhone Response: \(responseDict)")
                             let jsonData = try JSONSerialization.data(withJSONObject: responseDict, options: [])
                             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                                print("RAW JSON:", jsonString)
+//                                print("RAW JSON:", jsonString)
                             }
                             let profile =  try JSONDecoder().decode(
                                 GoPlayApiResponse<UserProfile>.self, from: jsonData)
@@ -162,7 +161,7 @@ public class GoApiService: @unchecked Sendable {
     public func checkDevice(success:@MainActor @escaping ([String: Any]) -> Void, failure:@MainActor @escaping (_ error : Error) -> Void) async {
         Task{@MainActor in
             var refreshToken: String? = KeychainHelper.loadCurrentSession()?.refreshToken ?? "";
-            print("checkDevice with refreshToken: \(refreshToken ?? "") ")
+//            print("checkDevice with refreshToken: \(refreshToken ?? "") ")
             if(refreshToken == nil  || refreshToken == "" ){
                 let error = NSError(domain: "CheckDevice", code: -1, userInfo: [NSLocalizedDescriptionKey: "refreshToken sent is empty"])
                 Task { @MainActor in
@@ -178,7 +177,7 @@ public class GoApiService: @unchecked Sendable {
                 await ApiService.shared.post(
                     path: GoApi.oauthDeviceLogin,
                     body: params,
-                    sign: false
+                    
                 ) { result in
 
                     LoadingDialog.instance.hide()
@@ -194,7 +193,7 @@ public class GoApiService: @unchecked Sendable {
                                 print("❌ checkDevice JSON is not a dictionary")
                                 return
                             }
-                            print("✅ checkDevice Parsed Response:", responseDict)
+//                            print("✅ checkDevice Parsed Response:", responseDict)
                             
                             success(responseDict)
                         } catch {
@@ -225,7 +224,7 @@ public class GoApiService: @unchecked Sendable {
             await ApiService.shared.post(
                     path: GoApi.oauthLogout,
                     body: params,
-                    sign: false
+                    
                 ) { result in
 
                     LoadingDialog.instance.hide()

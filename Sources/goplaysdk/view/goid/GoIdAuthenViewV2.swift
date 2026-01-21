@@ -241,7 +241,7 @@ public struct GoIdAuthenViewV2: View {
 
         // Now, you can call the `post` method on ApiService
         Task {
-            await ApiService.shared.post(path: GoApi.oauthLogin, body: bodyData)
+            await ApiService.shared.post(path: GoApi.oauthLogin, bodyJwtSign: bodyData)
             { result in
 
                 LoadingDialog.instance.hide()
@@ -257,7 +257,7 @@ public struct GoIdAuthenViewV2: View {
                     ),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-                        print("submitLoginGoId Response: \(responseDict)")
+//                        print("submitLoginGoId Response: \(responseDict)")
                         
                         onLoginResponse(response: responseDict)
                     }
@@ -288,14 +288,14 @@ public struct GoIdAuthenViewV2: View {
 
             if apiResponse.isSuccess() {
 
-                print(
-                    "onLoginResponse onRequestSuccess mustActive \(apiResponse.isMustActive()) token: \(apiResponse.data?.accessToken ?? "")"
-                )
+//                print(
+//                    "onLoginResponse onRequestSuccess mustActive \(apiResponse.isMustActive()) token: \(apiResponse.data?.accessToken ?? "")"
+//                )
                 if apiResponse.data != nil {
                     let tokenData: TokenData = apiResponse.data!
                     if let session = GoPlaySession.deserialize(data: tokenData)
                     {
-                        let isMustActive = true// GoPlaySDK.instance.isSandBox || apiResponse.isMustActive()
+                        let isMustActive =  apiResponse.isMustActive() // || GoPlaySDK.instance.isSandBox
                         AuthManager.shared.handleLoginSuccess(session, !isMustActive)
                         if(isMustActive){
                             //active xong sẽ noti envet login done sau
@@ -382,7 +382,7 @@ public struct GoIdAuthenViewV2: View {
 
         // Now, you can call the `post` method on ApiService
         Task {
-            await ApiService.shared.post(path: GoApi.oauthCheckAuthenOtp, body: bodyData) {
+            await ApiService.shared.post(path: GoApi.oauthCheckAuthenOtp, bodyJwtSign: bodyData) {
                 result in
 
                 LoadingDialog.instance.hide()
@@ -395,13 +395,13 @@ public struct GoIdAuthenViewV2: View {
                     do{
                         let apiResponse = try JSONDecoder().decode(CheckAuthenOtp.self, from: data)
                         
-                        print("apiResponse isSuccessed: \(apiResponse.isSuccessed) \(apiResponse.userCount)")
+//                        print("apiResponse isSuccessed: \(apiResponse.isSuccessed) \(apiResponse.userCount)")
                         if(apiResponse.isSuccessed == false || apiResponse.userCount == 0){
                             step = AuthenStep.askCreateAccountOrBack
                             phoneNumber = ""
                             goIdNumber = 0
                         }else{
-                            print("apiResponse phone: \(apiResponse.data[0].mobile)")
+//                            print("apiResponse phone: \(apiResponse.data[0].mobile)")
                             step = AuthenStep.loginWithPwd
                             phoneNumber = apiResponse.data[0].mobile ?? ""
                             goIdNumber = apiResponse.data[0].accountID ?? 0

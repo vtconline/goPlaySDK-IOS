@@ -36,11 +36,11 @@ public final class GoPlayFirebaseSDK {
 
     public func logEvent(name: String, parameters: [String: Any]? = nil) {
         Analytics.logEvent(name, parameters: parameters)
-        print("📊 [GoPlayFirebaseSDK] Logged event: \(name), parameters: \(parameters ?? [:])")
+//        print("📊 [GoPlayFirebaseSDK] Logged event: \(name), parameters: \(parameters ?? [:])")
     }
 
     public func recordError(_ error: Error) {
         // Crashlytics.crashlytics().record(error: error)
-        print("💥 [GoPlayFirebaseSDK] Error recorded: \(error.localizedDescription)")
+//        print("💥 [GoPlayFirebaseSDK] Error recorded: \(error.localizedDescription)")
     }
 }

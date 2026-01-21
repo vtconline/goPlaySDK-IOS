@@ -8,22 +8,32 @@ public class ApiService : @unchecked Sendable {
 
     public var clientId: String = "2356aa1f65af420c"
     public var clientSecret: String = "SwlDJHfkE8F8ldQr9wzwDF6jTMRG6+/5"
+    //product 1FsNyzLRvKSAibDOjPLGBxVlLsvvHwXJc7TAraPktaQ=
+    //dev "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk"
+    public var jwtBearerEcryptKey: String = "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk"
     
     public static let shared = ApiService()
     private init() {}
 
     private var isInitialized = false
     private var signer: JWTSigner?
+    private var signerEncryptKey: JWTSigner?
 
     func initJwtIfNeeded() async {
         guard !isInitialized else { return }
         isInitialized = true
-        print("Initializing JWT signer...")
+//        print("Initializing JWT signer...")
         
         let keyData = Data(clientSecret.utf8)
         signer = JWTSigner.hs256(key: keyData)
         
-        print("JWT signer ready.")
+        //project gopalyservices.authen class JwtBearerSettings.cs have jwtBearerEcryptKey
+        //must sychronize
+        let keyDataEncrypt = Data("\(clientSecret)\(jwtBearerEcryptKey)".utf8)
+        signerEncryptKey = JWTSigner.hs256(key: keyDataEncrypt)
+//        signerEncryptKey = JWTSigner.hs256(key: keyData)
+        
+//        print("JWT signer ready.")
     }
 
     private var bearerToken: String? {
@@ -36,10 +46,12 @@ public class ApiService : @unchecked Sendable {
             self.baseURL = GoApi.apiSandbox
 //            self.clientId = "2356aa1f65af420c"
 //            self.clientSecret  = "SwlDJHfkE8F8ldQr9wzwDF6jTMRG6+/5"
+            self.jwtBearerEcryptKey = "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk"
         }else {
             self.baseURL = GoApi.apiProduct
 //            self.clientId = "29658d7cd198458a"
 //            self.clientSecret  = "63/k6+G2LQVrFUOUOMvPzhz2scuwlBSrPMq+8UpMBRfTuWVGL+Aa2Q5i7rLzIy20"
+            self.jwtBearerEcryptKey = "1FsNyzLRvKSAibDOjPLGBxVlLsvvHwXJc7TAraPktaQ="
         }
         self.clientId = clientId
         self.clientSecret  = clientSecret
@@ -49,21 +61,97 @@ public class ApiService : @unchecked Sendable {
         self.baseURL = newBaseURL
     }
 
-    func get(path: String, sign: Bool = true,payloadType: Int = GoPayloadType.clientInfo, completion: @escaping (Result<Data, Error>) -> Void) async {
-        await request(method: "GET", path: path, sign: sign, payloadType: payloadType, completion: completion)
+    func get(path: String,  bodyJwtSign:[String: Any]? = nil,payloadType: Int = GoPayloadType.clientInfo, completion: @escaping (Result<Data, Error>) -> Void) async {
+        await request(method: "GET", path: path, bodyJwtSign: bodyJwtSign, payloadType: payloadType, completion: completion)
     }
 
-    func post(path: String, body: [String: Any], sign: Bool = true, payloadType: Int = GoPayloadType.clientInfo, completion: @escaping (Result<Data, Error>) -> Void) async {
-        await request(method: "POST", path: path, body: body, sign: sign, payloadType: payloadType, completion: completion)
+    func post(path: String, body: [String: Any]? = nil, bodyJwtSign:[String: Any]? = nil, payloadType: Int = GoPayloadType.clientInfo, completion: @escaping (Result<Data, Error>) -> Void) async {
+        await request(method: "POST", path: path, body: body, bodyJwtSign: bodyJwtSign, payloadType: payloadType, completion: completion)
     }
     
- 
-
     private func request(
         method: String,
         path: String,
         body: [String: Any]? = nil,
+        bodyJwtSign:[String: Any]? = nil,
+        payloadType: Int = GoPayloadType.clientInfo,
+        completion: @escaping (Result<Data, Error>) -> Void
+    ) async {
+        guard let url = URL(string: "\(baseURL)\(path)") else {
+            print("Invalid URL")
+            return
+        }
+//        print("url URL \(url)")
+
+        await initJwtIfNeeded()
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        
+        let partnerParams = Utils.getPartnerParams()
+        var bodyParams: [String: Any] = [:]
+        var bodyMerge: [String: Any]? = body
+
+        if method == "POST" {
+           
+                
+        
+                bodyParams["cid"] = clientId
+                bodyParams["clientId"] = clientId
+                bodyParams = bodyParams.merging(body ?? [:]) { current, _ in current }
+                bodyParams = bodyParams.merging(partnerParams ?? [:]) { current, _ in current }
+                if var signBody = bodyJwtSign {
+                    signBody = signBody.merging(partnerParams) { current, _ in current }
+                    bodyParams["jwt"] = await generatePayloadWithType(data: signBody, payloadType: payloadType) ?? ""
+                }
+                
+                if bodyParams.keys.contains("jwt") {
+//#if DEBUG
+//                    print("✅ bodyParams chứa key jwt ==> no add \(bodyParams)")
+//#endif
+                } else {
+                    bodyParams["jwt"] = KeychainHelper.loadCurrentSession()?.accessToken ?? ""
+                }
+
+            
+
+            if let token = bearerToken {
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            }
+
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: bodyParams, options: [])
+                request.httpBody = jsonData
+            } catch {
+                completion(.failure(error))
+                return
+            }
+        }
+
+        let task = URLSession.shared.dataTask(with: request) { data, _, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            if let data = data {
+                completion(.success(data))
+            } else {
+                let error = NSError(domain: "NetworkError", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned"])
+                completion(.failure(error))
+            }
+        }
+
+        task.resume()
+    }
+
+    private func request22(
+        method: String,
+        path: String,
+        body: [String: Any]? = nil,
         sign: Bool = false,
+        jwtSign:[String: Any]? = nil,
         payloadType: Int = GoPayloadType.clientInfo,
         completion: @escaping (Result<Data, Error>) -> Void
     ) async {
@@ -89,9 +177,11 @@ public class ApiService : @unchecked Sendable {
                     mergedBody = mergedBody.merging(partnerParams) { current, _ in current }
                     bodyMerge = mergedBody
                 }
-//                print("requestBody before jwt \(requestBody)")
+                
                 bodyMerge?["cid"] = clientId
                 bodyMerge?["clientId"] = clientId
+                bodyParams = bodyParams.merging(body ?? [:]) { current, _ in current }
+//                print("requestBody before jwt \(bodyMerge)")
                 bodyParams["jwt"] = await generatePayloadWithType(data: bodyMerge, payloadType: payloadType) ?? ""
             } else {
                 
@@ -101,12 +191,14 @@ public class ApiService : @unchecked Sendable {
                 bodyParams = bodyParams.merging(partnerParams ?? [:]) { current, _ in current }
                 bodyParams = bodyParams.merging(bodyMerge ?? [:]) { current, _ in current }
                 if bodyParams.keys.contains("jwt") {
+#if DEBUG
                     print("✅ bodyParams chứa key jwt ==> no add \(bodyParams)")
+#endif
                 } else {
                     bodyParams["jwt"] = KeychainHelper.loadCurrentSession()?.accessToken ?? ""
                 }
 //                print("requestBody bodyMerge no sign  \(bodyMerge)")
-                print("requestBody bodyParams no sign  \(bodyParams)")
+//                print("requestBody bodyParams no sign  \(bodyParams)")
             }
 
             if let token = bearerToken {
@@ -151,12 +243,12 @@ public class ApiService : @unchecked Sendable {
     }
     
     func generateSignature<C: Claims>(
-        claims: C
+        claims: C, useEncrypt: Bool = false
     ) async -> String? {
 
         await initJwtIfNeeded()
 
-        guard let signer = signer else {
+        guard let signer = (useEncrypt ? signerEncryptKey : signer) else {
             print("Signer not initialized")
             return nil
         }
@@ -164,7 +256,7 @@ public class ApiService : @unchecked Sendable {
         do {
             var jwt = JWT(claims: claims)
             let signedToken = try jwt.sign(using: signer)
-            print("jwt \(signedToken)")
+//            print("jwt \(signedToken)")
             return signedToken
         } catch {
             print("JWT signing error: \(error)")
@@ -193,6 +285,7 @@ public class ApiService : @unchecked Sendable {
                 jsonData = String(describing: data)
             }
             
+            var isEncrypt = false
             let claims: Claims;
             switch payloadType {
             case GoPayloadType.clientInfo:
@@ -206,8 +299,10 @@ public class ApiService : @unchecked Sendable {
                 )
                 break
             case GoPayloadType.userInfo:
+                isEncrypt = true
                 let goPlaySession =  AuthManager.shared.currentSesion()
                 claims = PayLoadUserInfo(
+                    iss: isSandBox ? "https://dev.goplay.vn" : "https://goplay.vn",
                     sub: clientId,
     //                aud: "access_token",
                     exp: Int(exp),
@@ -235,7 +330,7 @@ public class ApiService : @unchecked Sendable {
             
 
             
-            let signedToken = await generateSignature(claims: claims)
+            let signedToken = await generateSignature(claims: claims, useEncrypt: isEncrypt)
             return signedToken
         } catch {
             
@@ -266,7 +361,7 @@ public class ApiService : @unchecked Sendable {
             }
             
             
-
+           
             let claims : PayLoadUserInfo = PayLoadUserInfo(
             
                 sub: clientId,

@@ -136,7 +136,7 @@ public struct RegisterView: View {
         ]
         
         Task{
-            await ApiService.shared.post(path: GoApi.oauthRegister, body: bodyData) { result in
+            await ApiService.shared.post(path: GoApi.oauthRegister, bodyJwtSign: bodyData) { result in
                
                     LoadingDialog.instance.hide()
 

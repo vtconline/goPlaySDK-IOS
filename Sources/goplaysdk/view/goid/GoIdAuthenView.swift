@@ -197,7 +197,7 @@ public struct GoIdAuthenView: View {
 
         // Now, you can call the `post` method on ApiService
         Task {
-            await ApiService.shared.post(path: GoApi.oauthLogin, body: bodyData)
+            await ApiService.shared.post(path: GoApi.oauthLogin, bodyJwtSign: bodyData)
             { result in
 
                 LoadingDialog.instance.hide()

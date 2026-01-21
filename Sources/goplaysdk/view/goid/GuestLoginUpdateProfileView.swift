@@ -133,8 +133,7 @@ public struct GuestLoginUpdateProfileView: View {
         Task {
             await ApiService.shared.post(
                 path: GoApi.verifyPhone,//GoApi.verifyPhone GoApi.userRename
-                body: bodyData,
-                sign: false
+                body: bodyData
             ) { result in
 
                 LoadingDialog.instance.hide()

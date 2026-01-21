@@ -159,7 +159,7 @@ public struct SocialLoginGroupView: View {
 
         // Now, you can call the `post` method on ApiService
         Task {
-            await ApiService.shared.post(path: GoApi.oauthGuest, body: bodyData) { result in
+            await ApiService.shared.post(path: GoApi.oauthGuest, bodyJwtSign: bodyData) { result in
 
                 LoadingDialog.instance.hide()
 
@@ -224,7 +224,7 @@ public struct SocialLoginGroupView: View {
         print("requestLoginWithGoogle bodyData: \(bodyData)")
 
         Task {
-            await ApiService.shared.post(path: GoApi.oauthGoogle, body: bodyData) { result in
+            await ApiService.shared.post(path: GoApi.oauthGoogle, bodyJwtSign: bodyData) { result in
 
                 LoadingDialog.instance.hide()
                 switch result {
@@ -336,7 +336,7 @@ public struct SocialLoginGroupView: View {
             bodyData["apName"] = name
         }
         Task {
-            await ApiService.shared.post(path: GoApi.oauthApple, body: bodyData) { result in
+            await ApiService.shared.post(path: GoApi.oauthApple, bodyJwtSign: bodyData) { result in
                 LoadingDialog.instance.hide()
 
                 switch result {
