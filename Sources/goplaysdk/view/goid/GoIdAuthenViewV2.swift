@@ -60,7 +60,7 @@ public struct GoIdAuthenViewV2: View {
                     isPwd: false,
                     validator: usernameValidator,
                     //                leftIconName: "ic_user_focused",  // This should be the name of your image in Resources/Images
-                    isSystemIcon: false, isDisabled: $usernameLock,
+                    isSystemIcon: false, isDisabled: $usernameLock
                 )
                 .keyboardType(.asciiCapable)
                 
@@ -87,7 +87,7 @@ public struct GoIdAuthenViewV2: View {
                         placeholder: "Nhập mật khẩu",
                         isPwd: true,
                         validator: pwdValidator,
-                        isSystemIcon: false,
+                        isSystemIcon: false
                     )
                     .keyboardType(.default)
                     

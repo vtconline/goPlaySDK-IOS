@@ -37,7 +37,7 @@ public struct GoIdAuthenView: View {
                 isPwd: false,
                 validator: usernameValidator,
                 leftIconName: "ic_user_focused",  // This should be the name of your image in Resources/Images
-                isSystemIcon: false,
+                isSystemIcon: false
                 //                                           keyBoardFocused: $usernameFocus
             )
             .keyboardType(.asciiCapable)
@@ -48,7 +48,7 @@ public struct GoIdAuthenView: View {
                 isPwd: true,
                 validator: pwdValidator,
                 leftIconName: "ic_lock_focused",  // This should be the name of your image in Resources/Images
-                isSystemIcon: false,
+                isSystemIcon: false
                 //                keyBoardFocused: $passwordFocus
             )
             .keyboardType(.default)
