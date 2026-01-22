@@ -68,7 +68,7 @@ public struct PhoneActiveView: View {
             text: $phoneNumber,
             placeholder: "Nhập số điện thoại",
             isPwd: false,
-            validator: phoneNumberValidator,
+            validator: phoneNumberValidator
         )
         .keyboardType(.phonePad)
         .padding(.horizontal, 16)

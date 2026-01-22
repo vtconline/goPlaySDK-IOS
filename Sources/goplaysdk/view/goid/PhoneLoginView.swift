@@ -97,7 +97,9 @@ public struct PhoneLoginView: View {
             .padding(.vertical, 0)
             .padding(.horizontal, 32)
 
-            SocialLoginGroupView(haveGoIdLogin: true)
+            SocialLoginGroupView(haveGoIdLogin: true) { mustActive in
+//                showUIUpdatePhone = mustActive
+            }
 
             Spacer()
         }

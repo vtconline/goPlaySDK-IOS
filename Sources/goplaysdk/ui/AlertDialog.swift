@@ -23,7 +23,7 @@ public class AlertDialog: @unchecked Sendable {
         cancelTitle: String? = nil,
         onOk: (() -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
-        navigatorView: View? = nil, // Custom SwiftUI view to be navigator when press ok
+        navigatorView: (any View)? = nil // Custom SwiftUI view to be navigator when press ok
     ) {
         topViewController { topVC in
             guard let topVC = topVC else { return }

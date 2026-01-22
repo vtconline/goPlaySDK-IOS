@@ -157,7 +157,9 @@ public struct GoIdAuthenViewV2: View {
                 
 
                 if enalbeSocialLogin {
-                    SocialLoginGroupView(haveGoIdLogin: false)
+                    SocialLoginGroupView(haveGoIdLogin: false) { mustActive in
+                        showUIUpdatePhone = mustActive
+                    }
                 }
                 
             }

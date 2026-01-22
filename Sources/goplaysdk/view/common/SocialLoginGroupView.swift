@@ -1,16 +1,22 @@
 import AuthenticationServices
 import SwiftUI
 
-
+@MainActor
 public struct SocialLoginGroupView: View {
     @State private var authorizationController: ASAuthorizationController?
     //hostingController được truyền xuyên suốt cây view từ rootView(goplaysdk.getGoPlayView) -> các subview => access every where in sub child/view
     @Environment(\.hostingController) private var hostingController
+    
+    private let onLoginDone: (_ mustActive: Bool) -> Void
 
     private var haveGoIdLogin: Bool = false
-    public init(haveGoIdLogin: Bool) {
+    public init(haveGoIdLogin: Bool, onLoginDone: @escaping (_ mustActive: Bool) -> Void = {mustActive in }) {
         self.haveGoIdLogin = haveGoIdLogin
+        self.onLoginDone = onLoginDone
     }
+    
+    
+    
     var spaceOriented: CGFloat {
         // Dynamically set space based on the device orientation
         return DeviceOrientation.shared.isLandscape ? 10 : 10
@@ -236,7 +242,7 @@ public struct SocialLoginGroupView: View {
                         with: data, options: []),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-                        print("requestLoginWithGoogle done Response: \(responseDict)")
+//                        print("requestLoginWithGoogle done Response: \(responseDict)")
                         //nếu đã login gg -> update tk sang goId vi du sdkgoogle01/pwd..
                         //sau đó login lại = gg thì sẽ báo Tài khoản đã được unlink
                         //tức ko cho phép login tiếp = tk gg đã được sử dụng trước đó
@@ -348,7 +354,7 @@ public struct SocialLoginGroupView: View {
                         with: data, options: []),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-                        print("requestLoginWithApple Response: \(responseDict)")
+//                        print("requestLoginWithApple Response: \(responseDict)")
                         onLoginResponse(response: responseDict)
                     }
 
@@ -376,9 +382,17 @@ public struct SocialLoginGroupView: View {
                 if apiResponse.data != nil {
                     let tokenData: TokenData = apiResponse.data!
                     if let session = GoPlaySession.deserialize(data: tokenData) {
-                        KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
-                        AuthManager.shared.handleLoginSuccess(session)
-                        hostingController?.close() // close rootview(which add hostingController in gopalysdk.getGoPlayView)
+//                        KeychainHelper.save(key: GoConstants.goPlaySession, data: session)
+//                        AuthManager.shared.handleLoginSuccess(session)
+//                        hostingController?.close() // close rootview(which add hostingController in gopalysdk.getGoPlayView)
+                        
+                        let isMustActive =  apiResponse.isMustActive()
+                        AuthManager.shared.handleLoginSuccess(session, !isMustActive)
+                        if(!isMustActive){
+                            //close current view popup
+                            hostingController?.close()
+                        }
+                        self.onLoginDone(isMustActive)
                     } else {
                         AlertDialog.instance.show(message: "Không đọc được Token")
                     }

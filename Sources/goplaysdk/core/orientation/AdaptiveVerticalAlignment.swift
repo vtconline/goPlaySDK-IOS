@@ -16,7 +16,13 @@ struct AdaptiveVerticalAlignment: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func adaptiveVerticalAlignment() -> some View {
-        self.modifier(AdaptiveVerticalAlignment())
+        if #available(iOS 15.0, *){
+            self.modifier(AdaptiveVerticalAlignment())
+        }else{
+            self
+        }
+        
     }
 }

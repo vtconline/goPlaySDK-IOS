@@ -116,7 +116,9 @@ public struct GoIdAuthenView: View {
             .padding(.top, spaceOriented)  // Space between login and buttons in row
             .padding(.bottom, spaceOriented)
             if enalbeSocialLogin {
-                SocialLoginGroupView(haveGoIdLogin: false)
+                SocialLoginGroupView(haveGoIdLogin: false) { mustActive in
+//                    showUIUpdatePhone = mustActive
+                }
             }
 
         }

@@ -371,7 +371,7 @@ public class ApiService : @unchecked Sendable {
                 
                 aty: UInt8(goPlaySession?.accountType ?? 1),//0: fast play, 1: goID, 2: Facebook, 3: Google, 4: Apple
                 uid: goPlaySession?.userId ?? 0,
-                name: goPlaySession?.userName ?? "",
+                name: goPlaySession?.userName ?? ""
 //                dvId: "DEVICE_ID_001",
 //                os: "iOS",
 //                ip: "127.0.0.1",

@@ -35,14 +35,16 @@ extension View {
     func hidecompatNavigationTitleWhenLandscape() -> some View {
         self
             .onAppear {
-                updatecompatNavigationTitleVisibility()
+                Task { @MainActor in
+                       updatecompatNavigationTitleVisibility()
+                }
                 NotificationCenter.default.addObserver(
                     forName: UIDevice.orientationDidChangeNotification,
                     object: nil,
                     queue: .main
                 ) { _ in
                     Task { @MainActor in
-                                            updatecompatNavigationTitleVisibility()
+                           updatecompatNavigationTitleVisibility()
                     }
                 }
             }
@@ -76,6 +78,7 @@ extension View {
         #endif
     }
     
+    @MainActor
     @ViewBuilder
     public func navigateToDestination(navigationManager: NavigationManager)
         -> some View
@@ -141,6 +144,7 @@ extension View {
         }
 
     // Helper function to return the appropriate view based on the navigation destination
+    @MainActor
     private func navigateToDestinationView(destination: NavigationDestination?)
         -> some View
     {

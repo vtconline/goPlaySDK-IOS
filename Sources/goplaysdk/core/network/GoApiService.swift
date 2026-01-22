@@ -176,7 +176,7 @@ public class GoApiService: @unchecked Sendable {
             
                 await ApiService.shared.post(
                     path: GoApi.oauthDeviceLogin,
-                    body: params,
+                    body: params
                     
                 ) { result in
 
@@ -223,7 +223,7 @@ public class GoApiService: @unchecked Sendable {
             
             await ApiService.shared.post(
                     path: GoApi.oauthLogout,
-                    body: params,
+                    body: params
                     
                 ) { result in
 
