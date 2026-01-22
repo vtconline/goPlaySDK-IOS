@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'goplaysdk'
-  s.version          = '1.0.26'
+  s.version          = '1.0.27'
   s.summary          = 'GoPlay SDK for iOS'
 
   s.description      = <<-DESC
@@ -19,7 +19,7 @@ Written in Swift & SwiftUI.
 
   s.source           = {
     :git => 'https://github.com/vtconline/goPlaySDK-IOS.git',
-    :tag => 'v1.0.26'
+    :tag => 'v1.0.27'
   }
 
 
@@ -60,7 +60,7 @@ Written in Swift & SwiftUI.
   s.dependency 'VTC-GoogleSignIn', '~> 9.1'
   s.dependency 'FBSDKLoginKit', '~> 18.0'
   s.dependency 'FBSDKCoreKit',  '~> 18.0'
-  s.dependency 'Firebase/Analytics', '~> 11.15.0'
+  s.dependency 'Firebase/Analytics', '~> 10.24.0'  #11.15.0
     # s.dependency 'VTC-FirebaseAnalytics', '~> 12.8.0'
   # s.dependency 'Firebase/Crashlytics', '~> 12.7'
   s.dependency 'VTC-SwiftJWT', '4.0.1'
