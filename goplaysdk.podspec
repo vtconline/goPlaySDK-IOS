@@ -57,10 +57,11 @@ Written in Swift & SwiftUI.
   # Dependencies pod search GoogleSignIn --simple. ==> find latest version in cdn, in web cocoapod may not correct with podspec publish
   # s.dependency 'GoogleSignInCommunity', '~> 9.0'
   # s.dependency 'GoogleSignInSwiftSupport', '~> 9.1'
-  s.dependency 'VTC-GoogleSignIn', '~> 9.1'
+  # s.dependency 'VTC-GoogleSignIn', '~> 9.1'. if target ios 15
+  s.dependency 'GoogleSignIn', '~> 7.0'
   s.dependency 'FBSDKLoginKit', '~> 18.0'
   s.dependency 'FBSDKCoreKit',  '~> 18.0'
-  s.dependency 'Firebase/Analytics', '~> 10.24.0'  #11.15.0
+  s.dependency 'Firebase/Analytics', '~> 10.24.0'  #11.15.0 if target ios 15
     # s.dependency 'VTC-FirebaseAnalytics', '~> 12.8.0'
   # s.dependency 'Firebase/Crashlytics', '~> 12.7'
   s.dependency 'VTC-SwiftJWT', '4.0.1'
