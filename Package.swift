@@ -18,7 +18,7 @@ let package = Package(
             // JWTKit by Vapor
             //.package(url: "https://github.com/vapor/jwt-kit.git", from: "5.0.0"),
             .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "7.0.0"),
-            .package(url: "https://github.com/facebook/facebook-ios-sdk.git", exact: "14.1.0"),
+            .package(url: "https://github.com/facebook/facebook-ios-sdk.git", exact: "16.3.1"),//14.1.0
             .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.24.0"),//11.15.0
             .package(url: "https://github.com/Kitura/Swift-JWT.git", from: "4.0.2")
         ],
