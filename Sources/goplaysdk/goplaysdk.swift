@@ -74,11 +74,12 @@ import UIKit
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
-        return GoPlayFacebookSDK.shared.application(
-            app,
-            open: url,
-            options: options
-        )
+        return true
+//        return GoPlayFacebookSDK.shared.application(
+//            app,
+//            open: url,
+//            options: options
+//        )
     }
     @objc(application:didFinishLaunchingWithOptions:)
     public func application(
@@ -86,35 +87,36 @@ import UIKit
         didFinishLaunchingWithOptions launchOptions: [UIApplication
             .LaunchOptionsKey: Any]?
     ) -> Bool {
-        GoPlayFirebaseSDK.shared.initialize()
-        return GoPlayFacebookSDK.shared.application(
-            application,
-            didFinishLaunchingWithOptions: launchOptions
-        )
+        return true
+//        GoPlayFirebaseSDK.shared.initialize()
+//        return GoPlayFacebookSDK.shared.application(
+//            application,
+//            didFinishLaunchingWithOptions: launchOptions
+//        )
     }
     @objc(logEventFB:parameters:)
     public func logEventFB(
         eventName: String,
         parameters: [String: Any]? = nil
     ) {
-        GoPlayFacebookSDK.shared.logEvent(
-            name: eventName,
-            parameters: parameters
-        )
+//        GoPlayFacebookSDK.shared.logEvent(
+//            name: eventName,
+//            parameters: parameters
+//        )
     }
     @objc(logEvent:parameters:)
     public func logEvent(
         _ eventName: String,
         _ parameters: [String: Any]? = nil
     ) {
-        GoPlayFirebaseSDK.shared.logEvent(
-            name: eventName,
-            parameters: parameters
-        )
+//        GoPlayFirebaseSDK.shared.logEvent(
+//            name: eventName,
+//            parameters: parameters
+//        )
     }
     @objc(recordError:)
     public func recordError(_ error: NSError) {
-        GoPlayFirebaseSDK.shared.recordError(error)
+//        GoPlayFirebaseSDK.shared.recordError(error)
     }
 
     @objc public func getScreenWidth() -> CGFloat {
@@ -237,7 +239,7 @@ import UIKit
 
     @objc public func logOut() {
         //logout google,apple,fb,goId
-        GoogleSignInManager.shared.logOut()
+//        GoogleSignInManager.shared.logOut()
         SignInWithAppleDelegates.shared.logOut()
         Task{
             await GoApiService.shared.logOut(

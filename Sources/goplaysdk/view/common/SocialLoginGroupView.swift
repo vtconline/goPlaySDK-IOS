@@ -193,23 +193,23 @@ public struct SocialLoginGroupView: View {
 
     // Function for Gmail login (dummy)
     private func loginWithGmail() {
-        GoogleSignInManager.shared.signIn { user, error in
-            if let error = error {
-                print("loginWithGmail error: \(error)")
-                AlertDialog.instance.show(message: error.localizedDescription)
-            } else if let user = user {
-                //userName = user.profile.name
-                print("loginWithGmail user.serverAuthCode \(user.serverAuthCode)")
-                if let profile = user.user.profile, profile != nil {
-                    let idToken = user.user.idToken?.tokenString ?? ""
-
-                    requestLoginWithGoogle(
-                        gId: user.user.userID ?? "", gMail: profile.email,
-                        authenCode: user.serverAuthCode ?? "", name: profile.name)
-                }
-
-            }
-        }
+//        GoogleSignInManager.shared.signIn { user, error in
+//            if let error = error {
+//                print("loginWithGmail error: \(error)")
+//                AlertDialog.instance.show(message: error.localizedDescription)
+//            } else if let user = user {
+//                //userName = user.profile.name
+//                print("loginWithGmail user.serverAuthCode \(user.serverAuthCode)")
+//                if let profile = user.user.profile, profile != nil {
+//                    let idToken = user.user.idToken?.tokenString ?? ""
+//
+//                    requestLoginWithGoogle(
+//                        gId: user.user.userID ?? "", gMail: profile.email,
+//                        authenCode: user.serverAuthCode ?? "", name: profile.name)
+//                }
+//
+//            }
+//        }
     }
 
     private func requestLoginWithGoogle(

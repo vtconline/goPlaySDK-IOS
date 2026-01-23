@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - joycity_remove_gg_fb_firebase
 
 jobs:
   release:
