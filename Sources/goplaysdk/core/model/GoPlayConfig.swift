@@ -1,3 +1,4 @@
+import Foundation
 public struct GoPlayConfig: Decodable {
     public let redirectUrl: String?
     public let tokenExpired: Bool?

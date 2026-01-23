@@ -3,6 +3,7 @@ public struct GoPlayApiResponse<T: Codable>: Codable {
     let message: String
     let data: T?
     let mustActive: Int?
+    let nextStep: Int?
     
     static func createTest(
             code: Int = GoErrorCode.Authen.ok.rawValue,
@@ -14,7 +15,8 @@ public struct GoPlayApiResponse<T: Codable>: Codable {
                 code: code,
                 message: message,
                 data: data,
-                mustActive: mustActive
+                mustActive: mustActive,
+                nextStep: nil
             )
         }
 

@@ -95,4 +95,18 @@ public class Utils {
             return nil
         }
     }
+    static func isValidVietnamPhone(_ phone: String) -> Bool {
+        let pattern = "^0[1-9][0-9]{8}$"
+        return phone.range(of: pattern, options: .regularExpression) != nil
+    }
+    
+    static func sendSMS(phone: String, body: String) {
+        let bodyEncoded = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "sms:\(phone)&body=\(bodyEncoded)"
+
+        if let url = URL(string: urlString),
+           UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        }
+    }
 }

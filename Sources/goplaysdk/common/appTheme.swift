@@ -31,4 +31,8 @@ public class AppTheme {
     public struct Paddings{
         static let  horizontal: CGFloat = 16
     }
+    
+    public struct Buttons{
+        static let  defaultWidth: CGFloat = 300
+    }
 }

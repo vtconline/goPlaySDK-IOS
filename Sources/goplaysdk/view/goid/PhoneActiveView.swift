@@ -5,13 +5,13 @@ public struct PhoneActiveView: View {
 
     @Environment(\.hostingController) private var hostingController
 
-    private let onBack: () -> Void
-
     @StateObjectCompat private var navigationManager = NavigationManager()
 
     @State private var step = 0
     @State private var otpNumber = ""
     @State private var phoneNumber = ""
+
+    @State private var isDisablePhoneTxt = false
 
     @State private var otpRemainTxt = ""
     @State private var otpTimeTotal = 0
@@ -20,8 +20,23 @@ public struct PhoneActiveView: View {
     @StateObjectCompat private var phoneNumberValidator = PhoneValidator()
     @StateObjectCompat private var otpValidator = OTPValidator()
 
-    public init(onBack: @escaping () -> Void = {}) {
+    private let onBack: (() -> Void)?
+    private let onPhoneActiveCallback: ((_ mustActive: Bool) -> Void)?
+
+    public init(
+        phone: String = "",
+        onBack: (() -> Void)? = nil,
+        onPhoneActive: ((_ mustActive: Bool) -> Void)? = nil
+    ) {
         self.onBack = onBack
+        self.onPhoneActiveCallback = onPhoneActive
+        if phone.isEmpty == false {
+            //_step = State(initialValue: 1)
+            _isDisablePhoneTxt = State(initialValue: true)
+        }
+        _phoneNumber = .init(initialValue: phone)
+
+        //        print(" PhoneActiveView phone \(phone) step \(step)")
     }
     var spaceOriented: CGFloat {
         // Dynamically set space based on the device orientation
@@ -36,8 +51,18 @@ public struct PhoneActiveView: View {
                 verifyOTPview()
             }
             OTPNoteView()
-                .frame(maxWidth: DeviceOrientation.shared.isLandscape ? .infinity : 300, alignment: .leading)
+                .frame(
+                    maxWidth: DeviceOrientation.shared.isLandscape
+                        ? .infinity : 300,
+                    alignment: .leading
+                )
         }
+        //        .onAppear {
+        //            print("phoneNumberphoneNumber \(phoneNumber)")
+        //            if phoneNumber.isEmpty == false {
+        //                step = 1
+        //            }
+        //        }
         .observeOrientation()  // Apply the modifier to detect orientation changes
         .navigateToDestination(navigationManager: navigationManager)  // Using the extension method
         //        .navigationBarHidden(true) // hide navigaotr bar at top
@@ -68,7 +93,8 @@ public struct PhoneActiveView: View {
             text: $phoneNumber,
             placeholder: "Nhập số điện thoại",
             isPwd: false,
-            validator: phoneNumberValidator
+            validator: phoneNumberValidator,
+            isDisabled: $isDisablePhoneTxt
         )
         .keyboardType(.phonePad)
         .padding(.horizontal, 16)
@@ -114,31 +140,29 @@ public struct PhoneActiveView: View {
             AlertDialog.instance.show(message: "SĐT không được bỏ trống")
             return
         }
-//        if(GoPlaySDK.instance.isSandBox){
-//            print("use https://sandbox.goplay.vn/thong-tin-testt.html để lấy otp")
-//            let testData: [String: Any] = [:]
-//            checkOtpResponse(response: testData)
-//            return
-//        }
-        
+        //        if(GoPlaySDK.instance.isSandBox){
+        //            print("use https://sandbox.goplay.vn/thong-tin-testt.html để lấy otp")
+        //            let testData: [String: Any] = [:]
+        //            checkOtpResponse(response: testData)
+        //            return
+        //        }
+
         LoadingDialog.instance.show()
         Task {
             var bodyData: [String: Any] = [
-                "mobile": phoneNumber,
-                
+                "mobile": phoneNumber
+
             ]
-            
+
             //test
-//            var params222 = GoApiService.shared.getuserParams(nil)
-//            bodyData = bodyData.merging(params222 ?? [:]) { current, _ in current }
-//            //test
-//            
-//            
-//            var bodyMerge = Utils.getPartnerParams()
-//            bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
-            
-            
-            
+            //            var params222 = GoApiService.shared.getuserParams(nil)
+            //            bodyData = bodyData.merging(params222 ?? [:]) { current, _ in current }
+            //            //test
+            //
+            //
+            //            var bodyMerge = Utils.getPartnerParams()
+            //            bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
+
             await ApiService.shared.post(
                 path: GoApi.oauthPhoneGetOtp,
                 body: bodyData,
@@ -159,8 +183,8 @@ public struct PhoneActiveView: View {
                     ),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-//                        print("submitGetOtp Response: \(responseDict)")
-                        
+                        print("submitGetOtp Response: \(responseDict)")
+
                         checkOtpResponse(response: responseDict)
                     }
 
@@ -182,18 +206,18 @@ public struct PhoneActiveView: View {
                 withJSONObject: response,
                 options: []
             )
-            let apiResponse : GoPlayApiResponse<Int>
-            
-//            if(GoPlaySDK.instance.isSandBox){
-//                apiResponse = GoPlayApiResponse<Int>.createTest(
-//                    data: 300
-//                )
-//            }else{
-//                apiResponse = try JSONDecoder().decode(
-//                    GoPlayApiResponse<Int>.self,
-//                    from: jsonData
-//                )
-//            }
+            let apiResponse: GoPlayApiResponse<Int>
+
+            //            if(GoPlaySDK.instance.isSandBox){
+            //                apiResponse = GoPlayApiResponse<Int>.createTest(
+            //                    data: 300
+            //                )
+            //            }else{
+            //                apiResponse = try JSONDecoder().decode(
+            //                    GoPlayApiResponse<Int>.self,
+            //                    from: jsonData
+            //                )
+            //            }
             apiResponse = try JSONDecoder().decode(
                 GoPlayApiResponse<Int>.self,
                 from: jsonData
@@ -227,7 +251,7 @@ public struct PhoneActiveView: View {
 
                             },
                             onFinish: {
-//                                print("onFinish tick: ")
+                                //                                print("onFinish tick: ")
                                 step = 0
                                 otpRemainTxt = ""
                             }
@@ -277,17 +301,17 @@ public struct PhoneActiveView: View {
         //    apple login swift sample dev    goId: Ma xac thuc cua ban la: 298604, MKC2 cua ban la: 124A2805. MKC2 chi co tac dung sau khi xac thuc.
         var bodyData: [String: Any] = [
             "mobile": phoneNumber,
-            "otp": otpNumber
+            "otp": otpNumber,
         ]
         //test
-//        var params222 = GoApiService.shared.getuserParams(nil)
-//        bodyData = bodyData.merging(params222 ?? [:]) { current, _ in current }
-//        //test
-//
-//        var bodyMerge = Utils.getPartnerParams()
-//        bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
+        //        var params222 = GoApiService.shared.getuserParams(nil)
+        //        bodyData = bodyData.merging(params222 ?? [:]) { current, _ in current }
+        //        //test
+        //
+        //        var bodyMerge = Utils.getPartnerParams()
+        //        bodyData = bodyData.merging(bodyMerge ?? [:]) { current, _ in current }
 
-//        print("oApi.phoneactive params \(bodyData)")
+        //        print("oApi.phoneactive params \(bodyData)")
         Task {
             await ApiService.shared.post(
                 path: GoApi.oauthPhoneActiveOtp,  //GoApi.verifyPhone GoApi.userRename
@@ -309,7 +333,7 @@ public struct PhoneActiveView: View {
                     ),
                         let responseDict = jsonResponse as? [String: Any]
                     {
-//                        print("requestVerifyOtp Response: \(responseDict)")
+                        //                        print("requestVerifyOtp Response: \(responseDict)")
                         onUpdateInfoResponse(response: responseDict)
 
                     }
@@ -339,10 +363,12 @@ public struct PhoneActiveView: View {
             var message = "Lỗi OTP"
 
             if apiResponse.isSuccess() {
-                if(AuthManager.shared.currentSesion() != nil){
-                    AuthManager.shared.handleLoginSuccess(AuthManager.shared.currentSesion()!)
+                self.onPhoneActiveCallback?(true)
+                if AuthManager.shared.currentSesion() != nil {
+                    AuthManager.shared.handleLoginSuccess(
+                        AuthManager.shared.currentSesion()!
+                    )
                 }
-                
 
                 hostingController?.close()
             } else {

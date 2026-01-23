@@ -87,7 +87,7 @@ public struct GoIdAuthenView: View {
                 }
 
                 if #available(iOS 15.0, *), AuthManager.shared.isActivePhone() {
-                    NavigationLink(destination: ResetPwdView(goId: 0, phoneNumber: "")) {
+                    NavigationLink(destination: ResetPwdView(goId: 0, phoneNumber: "", userName: username)) {
                         Text("Quên mật khẩu?")
                             .foregroundColor(.blue)
                             .padding(.horizontal, 10)

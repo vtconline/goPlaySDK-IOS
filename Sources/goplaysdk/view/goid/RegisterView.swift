@@ -10,6 +10,9 @@ public struct RegisterView: View {
     @State private var passWord = ""
     @State private var rePassWord = ""
     
+    //reigster by otp (phone)
+    @State private var otp = ""
+    
     @State private var showUIUpdatePhone = false
     
     
@@ -22,9 +25,12 @@ public struct RegisterView: View {
 
 
 
-    public init(user: String = "") { 
+    
+
+    public init(user: String = "") {
         _userName = State(initialValue: user)
        _usernameLock =  State(initialValue: !user.isEmpty)
+       
     }
 
     var spaceOriented: CGFloat {
@@ -49,40 +55,10 @@ public struct RegisterView: View {
             )
             .keyboardType(.default)
             .padding(.horizontal, 16)
-
-            //Mật khẩu gồm ít nhất 1 chữ thường, 1 số, 1 viết hoa
-//            Ít nhất 8 ký tự
-            GoTextField<PasswordValidator>(
-                text: $passWord, placeholder: "Nhập mật khẩu", isPwd: true,
-                validator: passwordValidator, leftIconName: "ic_lock_focused",
-                isSystemIcon: false
-            )
-            .keyboardType(.default)
-            .padding(.horizontal, 16)
-
-            GoTextField<PasswordValidator>(
-                text: $rePassWord, placeholder: "Nhập lại mật khẩu", isPwd: true,
-                validator: rePassWordValidator, leftIconName: "ic_lock_focused",
-                isSystemIcon: false
-            )
-            .padding(.horizontal, 16)
             
-            Text("Mật khẩu bao gồm:\n- Mật khẩu gồm ít nhất 1 chữ thường, 1 số, 1 viết hoa\n- Ít nhất 8 ký tự")
-//                .fontWeight(.semibold)
-                .font(.system(size: 14))
-                .foregroundColor(.black)
-                .padding(.vertical, 10)
-                .frame(maxWidth: 300, alignment: .leading)
-           
+            registerPwdView()
 
-            GoButton(color: .black, action: {
-                 submitRegister()
-                
-            }){
-                Text("Đăng ký")
-                .font(.system(size: 16))
-                .foregroundColor(.white)
-            }
+            
 
             Spacer()
         }
@@ -99,6 +75,45 @@ public struct RegisterView: View {
             GoPlayDismissButton()
         }
 
+    }
+    
+   
+    
+    @ViewBuilder
+    private func registerPwdView() -> some View {
+        //Mật khẩu gồm ít nhất 1 chữ thường, 1 số, 1 viết hoa
+//            Ít nhất 8 ký tự
+        GoTextField<PasswordValidator>(
+            text: $passWord, placeholder: "Nhập mật khẩu", isPwd: true,
+            validator: passwordValidator, leftIconName: "ic_lock_focused",
+            isSystemIcon: false
+        )
+        .keyboardType(.default)
+        .padding(.horizontal, 16)
+
+        GoTextField<PasswordValidator>(
+            text: $rePassWord, placeholder: "Nhập lại mật khẩu", isPwd: true,
+            validator: rePassWordValidator, leftIconName: "ic_lock_focused",
+            isSystemIcon: false
+        )
+        .padding(.horizontal, 16)
+        
+        Text("Mật khẩu bao gồm:\n- Mật khẩu gồm ít nhất 1 chữ thường, 1 số, 1 viết hoa\n- Ít nhất 8 ký tự")
+//                .fontWeight(.semibold)
+            .font(.system(size: 14))
+            .foregroundColor(.black)
+            .padding(.vertical, 10)
+            .frame(maxWidth: AppTheme.Buttons.defaultWidth, alignment: .leading)
+       
+
+        GoButton(color: .black, action: {
+             submitRegister()
+            
+        }){
+            Text("Đăng ký")
+            .font(.system(size: 16))
+            .foregroundColor(.white)
+        }
     }
 
     private func submitRegister()  {
@@ -188,7 +203,13 @@ public struct RegisterView: View {
                     }
                     let tokenData: TokenData = apiResponse.data!
                     if let session = GoPlaySession.deserialize(data: tokenData) {
-                        UserDefaults.standard.set(session.userName, forKey: GoConstants.savedUserName)
+//                        UserDefaults.standard.set(session.userName, forKey: GoConstants.savedUserName)
+                        let result : Result<Void, AccountManagerError> = AccountManager.saveAndSetCurrent(Account(
+                            userId: Int(session.userId ?? 0) ,
+                            username: session.userName ?? "",
+                           credential: passWord
+                       ))
+
                         AuthManager.shared.handleLoginSuccess(session)
                         hostingController?.close()
                     } else {

@@ -26,12 +26,12 @@ struct ResponsiveView<PortraitContent: View, LandscapeContent: View>: View {
             .onAppear {
                 // Initial orientation check when the view appears
                 self.isLandscape = DeviceOrientation.shared.isLandscape
-                print("isLandscape \(DeviceOrientation.shared.isLandscape)")
+//                print("isLandscape \(DeviceOrientation.shared.isLandscape)")
             }
             .onChangeCompat(of: geometry.size) { newSize in
                 // Detect orientation changes when size changes
                 self.isLandscape = DeviceOrientation.shared.isLandscape
-                print("onChange geometry.size isLandscape \(DeviceOrientation.shared.isLandscape)")
+//                print("onChange geometry.size isLandscape \(DeviceOrientation.shared.isLandscape)")
             }
             .padding(.horizontal,0)
             .padding(.vertical, 0)

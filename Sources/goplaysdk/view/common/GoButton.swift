@@ -58,6 +58,7 @@ public struct GoButton<Content: View>: View {
         self.useDefaultWidth = useDefaultWidth
     }
     
+    
     public var body: some View {
         Button(action: {
             action?()

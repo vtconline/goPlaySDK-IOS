@@ -76,6 +76,10 @@ public class AuthManager: NSObject, @unchecked Sendable {
             error: nil
         )
     }
+    
+    public func saveSession(_ session: GoPlaySession){
+        authStorage.saveCurrentSession(session)
+    }
 
     /// Current logged-in user (cached)
     public func currentUser() -> UserProfile? {
@@ -107,6 +111,7 @@ public class AuthManager: NSObject, @unchecked Sendable {
         )
         
     }
+
 
     
 }

@@ -7,6 +7,7 @@ public enum GoApi {
     static let oauthConfig = "authen-service/oauth/getconfig"
     static let oauthCheckAuthenOtp = "authen-service/oauth/checkauthenotp"
     static let oauthGetAuthenOtp = "authen-service/oauth/getauthenOtp"
+    static let oauthResetPwdOtp = "authen-service/oauth/resetpassbyotp"
     static let oauthLogin = "authen-service/oauth/login"
     static let oauthRegister = "authen-service/oauth/register"
     static let oauthDeviceLogin = "authen-service/oauth/devicelogin"
@@ -22,5 +23,6 @@ public enum GoApi {
     static let userRename = "authen-service/users/update/rename"
     static let oauthPhoneGetOtp = "authen-service/users/phone/otp/get"
     static let oauthPhoneActiveOtp = "authen-service/users/phone/otp/active"
+    
     
 }

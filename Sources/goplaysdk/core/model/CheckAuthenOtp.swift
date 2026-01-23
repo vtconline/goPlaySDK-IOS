@@ -8,7 +8,22 @@ public struct CheckAuthenOtp: Codable {
     var haveError: Bool = false
     var redirectUrl: String? = nil
     var tokenExpired: Bool = false
-    var nextStep: Int = 0
+    /// <summary>
+    /// nextStep: 0: Do nothing, 1: Register Account, 2: Login With OTP , 3: Login With Password (usernam =Tel, Email, username),
+    /// 4: Login with password must input username, 5: Must update password
+    /// </summary>
+    var nextStep: Int = GoNextStep.doNothing.rawValue
+    
+    var isMobile: Bool = false
+    var isMobileforceSetPassword: Bool = false
+    var isMobileAccount: Bool = false
+    var isEmailAccount: Bool = false
+    
+    //goId
+    var userInputAccountID: Int = 0
+    var isCheckAccountMobileActived: Bool = false
+    var userInput: String = ""
+    
 
     enum CodingKeys: String, CodingKey {
         case userCount
@@ -21,22 +36,65 @@ public struct CheckAuthenOtp: Codable {
         case redirectUrl
         case tokenExpired = "token_expired"
         case nextStep
+        case isMobile
+        case isMobileforceSetPassword
+        case userInputAccountID
+        case isCheckAccountMobileActived
+        case userInput
+        case isMobileAccount
+        case isEmailAccount
     }
     
-    public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+    public  func isCreateNewAccount() -> Bool {
+        return nextStep == 1 || userCount == 0 || userInputAccountID == 0
+        
+    }
 
-            self.userCount = try container.decodeIfPresent(Int.self, forKey: .userCount) ?? 0
-            self.loginType = try container.decodeIfPresent(Int.self, forKey: .loginType) ?? LoginType.phone.rawValue
-            self.code = try container.decodeIfPresent(Int.self, forKey: .code) ?? 0
-            self.message = try container.decodeIfPresent(String.self, forKey: .message) ?? ""
-            self.data = try container.decodeIfPresent([CheckAuthenUserInfo].self, forKey: .data) ?? []
-            self.isSuccessed = try container.decodeIfPresent(Bool.self, forKey: .isSuccessed) ?? true
-            self.haveError = try container.decodeIfPresent(Bool.self, forKey: .haveError) ?? false
-            self.redirectUrl = try container.decodeIfPresent(String.self, forKey: .redirectUrl)
-            self.tokenExpired = try container.decodeIfPresent(Bool.self, forKey: .tokenExpired) ?? false
-            self.nextStep = try container.decodeIfPresent(Int.self, forKey: .nextStep) ?? 0
-        }
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.userCount =
+            try container.decodeIfPresent(Int.self, forKey: .userCount) ?? 0
+        self.loginType =
+            try container.decodeIfPresent(Int.self, forKey: .loginType)
+            ?? LoginType.phone.rawValue
+        self.code = try container.decodeIfPresent(Int.self, forKey: .code) ?? 0
+        self.message =
+            try container.decodeIfPresent(String.self, forKey: .message) ?? ""
+        self.data =
+            try container.decodeIfPresent(
+                [CheckAuthenUserInfo].self,
+                forKey: .data
+            ) ?? []
+        self.isSuccessed =
+            try container.decodeIfPresent(Bool.self, forKey: .isSuccessed)
+            ?? true
+        self.haveError =
+            try container.decodeIfPresent(Bool.self, forKey: .haveError)
+            ?? false
+        self.redirectUrl = try container.decodeIfPresent(
+            String.self,
+            forKey: .redirectUrl
+        )
+        self.tokenExpired =
+            try container.decodeIfPresent(Bool.self, forKey: .tokenExpired)
+            ?? false
+        self.nextStep =
+            try container.decodeIfPresent(Int.self, forKey: .nextStep) ?? 0
+        
+        self.isMobile =
+            try container.decodeIfPresent(Bool.self, forKey: .isMobile)
+            ?? false
+        self.isMobileforceSetPassword =
+        try container.decodeIfPresent(Bool.self, forKey: .isMobileforceSetPassword)
+        ?? false
+        
+        self.userInputAccountID = try container.decodeIfPresent(Int.self, forKey: .userInputAccountID) ?? 0
+        
+        self.isCheckAccountMobileActived = try container.decodeIfPresent(Bool.self, forKey: .isCheckAccountMobileActived)
+        ?? false
+        self.userInput = try container.decodeIfPresent(String.self, forKey: .userInput) ?? ""
+    }
 }
 
 public struct CheckAuthenUserInfo: Codable {

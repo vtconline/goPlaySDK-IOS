@@ -1,5 +1,6 @@
 
 import UIKit
+import SwiftUI
 //@MainActor
 class LoadingDialog : @unchecked Sendable{
     // Singleton instance
@@ -32,30 +33,61 @@ class LoadingDialog : @unchecked Sendable{
             overlay.backgroundColor = UIColor.black.withAlphaComponent(0.5)
             //set touch on overlay -> prevent touch on below view
             overlay.isUserInteractionEnabled = true
-            // Create and add spinner
-    //        let loadingBox = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-    //        loadingBox.backgroundColor = UIColor.black.withAlphaComponent(0.8)
-    //        loadingBox.layer.cornerRadius = 10
-    //        loadingBox.center = overlay.center
-     
-              
-            let spinner = UIActivityIndicatorView(style: .large)
-            spinner.center = CGPoint(x: 50, y: 50)
-            let uiColor: UIColor
-            if #available(iOS 14.0, *) {
-                uiColor = UIColor(AppTheme.Colors.primary)
-            } else {
-                uiColor = AppTheme.Colors.primaryUIColor
-            }
-            spinner.color = uiColor // UIColor(AppTheme.Colors.primary)
-            spinner.center = overlay.center //remove if use loadingBox
-            spinner.startAnimating()
-            
-    //        loadingBox.addSubview(spinner)
-    //         overlay.addSubview(loadingBox)
-            overlay.addSubview(spinner)
+            let containerSize: CGFloat = 120
+            let container = UIView(frame: CGRect(
+                x: 0, y: 0,
+                width: containerSize,
+                height: containerSize
+            ))
+            container.center = overlay.center
+            container.backgroundColor = .clear
 
-            // Add overlay to parent
+            // Image
+            let imageSize: CGFloat = 24
+            let imageView = UIImageView(frame: CGRect(
+                x: 0, y: 0,
+                width: imageSize,
+                height: imageSize
+            ))
+            imageView.center = CGPoint(
+                x: container.bounds.midX,
+                y: container.bounds.midY
+            )
+            imageView.contentMode = .scaleAspectFit
+            imageView.backgroundColor = .clear
+
+            if let img = UIImage(named: "avatar-login", in: Bundle.goplaysdk, compatibleWith: nil) {
+                imageView.image = img
+            } else {
+                print("❌ Image not found in bundle")
+            }
+            
+
+
+            // Spinner
+            let spinner = UIActivityIndicatorView(style: .large)
+            spinner.frame = container.bounds
+            spinner.center = CGPoint(
+                x: container.bounds.midX,
+                y: container.bounds.midY
+            )
+//            spinner.frame = container.bounds
+//            spinner.center = CGPoint(x: containerSize / 2, y: containerSize / 2)
+
+            let spinnerColor: UIColor
+            if #available(iOS 14.0, *) {
+                spinnerColor = UIColor(AppTheme.Colors.primary)
+            } else {
+                spinnerColor = AppTheme.Colors.primaryUIColor
+            }
+            spinner.color = spinnerColor
+            spinner.startAnimating()
+
+            // Add views
+            container.addSubview(spinner)
+//            container.addSubview(imageView)
+            overlay.addSubview(container)
+
             parentView.addSubview(overlay)
 
             // Store reference to remove later

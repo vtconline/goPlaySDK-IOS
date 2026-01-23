@@ -102,6 +102,7 @@ public class ApiService : @unchecked Sendable {
                 bodyParams = bodyParams.merging(partnerParams ?? [:]) { current, _ in current }
                 if var signBody = bodyJwtSign {
                     signBody = signBody.merging(partnerParams) { current, _ in current }
+                    print("✅ signBody \(signBody)")
                     bodyParams["jwt"] = await generatePayloadWithType(data: signBody, payloadType: payloadType) ?? ""
                 }
                 
