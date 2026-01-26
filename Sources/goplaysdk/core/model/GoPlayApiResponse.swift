@@ -35,4 +35,12 @@ public struct GoPlayApiResponse<T: Codable>: Codable {
     func tokenExpired() -> Bool {
         return code == GoErrorCode.Authen.expired.rawValue && message == "token_expired"
     }
+    
+    func isOtpLimit() -> Bool {
+        return code == GoErrorCode.Authen.otpLimit.rawValue
+    }
+    
+    func isOtpExpire() -> Bool {
+        return code == GoErrorCode.Authen.otpExpire.rawValue
+    }
 }

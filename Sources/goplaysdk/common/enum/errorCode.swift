@@ -9,8 +9,10 @@ enum GoErrorCode {
     enum Authen: Int {
         case ok = 0
         case missingParameter = 81
+        case otpLimit = 41
         case expired = 86
         case codeUnknown = 99
+        case otpExpire = 211
         case phoneNotValidated = 208
         case emailNotValidated = 407
         case unknown = -99

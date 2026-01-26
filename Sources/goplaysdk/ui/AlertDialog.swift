@@ -34,10 +34,14 @@ public class AlertDialog: @unchecked Sendable {
             DispatchQueue.main.async {
                 let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 
-                if let cancel = cancelTitle {
-                    alert.addAction(UIAlertAction(title: cancel, style: .cancel) { _ in
-                        onCancel?()
-                    })
+                
+                if cancelTitle != nil || onCancel != nil {
+                    let title = cancelTitle ?? "Hủy"
+                    alert.addAction(
+                        UIAlertAction(title: title, style: .cancel) { _ in
+                            onCancel?()
+                        }
+                    )
                 }
 
                 alert.addAction(UIAlertAction(title: okTitle, style: .default) { _ in

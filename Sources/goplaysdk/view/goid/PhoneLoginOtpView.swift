@@ -16,7 +16,7 @@ public struct PhoneLoginOtpView: View {
 
     @State private var isSentOtp = false
 
-    @State private var otpRemainTxt = ""
+    @State private var otpRemainTxt = "Vui lòng nhấn Gửi OTP để lấy mã"
     @State private var otpTimeTotal = 0
 
     //tao mat khau
@@ -60,12 +60,7 @@ public struct PhoneLoginOtpView: View {
                     )
             } else {
                 createPassWordView()
-                Text("Mật khẩu bao gồm:\n- Mật khẩu gồm ít nhất 1 chữ thường, 1 số, 1 viết hoa\n- Ít nhất 8 ký tự")
-        //                .fontWeight(.semibold)
-                    .font(.system(size: 14))
-                    .foregroundColor(.black)
-                    .padding(.vertical, 10)
-                    .frame(maxWidth: AppTheme.Buttons.defaultWidth, alignment: .leading)
+                
             }
             
         }
@@ -130,7 +125,16 @@ public struct PhoneLoginOtpView: View {
                         Text("Xác nhận")
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
-                    }
+                    }.padding(.top, 16)
+        
+        Text("Mật khẩu bao gồm:\n- Mật khẩu gồm ít nhất 1 chữ thường, 1 số, 1 viết hoa\n- Ít nhất 8 ký tự")
+//                .fontWeight(.semibold)
+            .font(.system(size: 14))
+            .foregroundColor(.black)
+            .padding(.vertical, 10)
+            .frame(maxWidth: AppTheme.Buttons.defaultWidth, alignment: .leading)
+        
+        Spacer()
 
         
 
@@ -144,14 +148,15 @@ public struct PhoneLoginOtpView: View {
             .font(.system(size: 16))
 
         OTPInputView(otp: $otpNumber)
-            .frame(maxWidth: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity, alignment: .center).padding(.top, 12)
+            
 
         Text("\(otpRemainTxt)")
-            .foregroundColor(.red)
+            .foregroundColor(.red).padding(.top, 12)
         Text(
             "OTP chỉ có giá trị trong vòng \(String(format: "%02d:%02d",otpTimeTotal/60,otpTimeTotal%60)) phút"
         )
-        .foregroundColor(.black)
+        .foregroundColor(.black).padding(.top, 12)
 
         GoButton(
             color: .black,
@@ -160,7 +165,7 @@ public struct PhoneLoginOtpView: View {
             Text(isSentOtp ? "Xác nhận" : "Gửi OTP")
                 .font(.system(size: 16))
                 .foregroundColor(.white)
-        }
+        }.padding(.top, 12)
         Spacer()
 
     }
@@ -232,7 +237,7 @@ public struct PhoneLoginOtpView: View {
             var message = "Lỗi OTP"
             var haveError = true
 
-            if apiResponse.isSuccess() {
+            if apiResponse.isSuccess() || apiResponse.isOtpLimit() {
                 //print("checkOtpResponse onRequestSuccess data: \(apiResponse.data ?? 0)")
                 isSentOtp = true
 
@@ -260,7 +265,7 @@ public struct PhoneLoginOtpView: View {
                             onFinish: {
                                 //                                print("onFinish tick: ")
                                 //                                step = 0
-                                otpRemainTxt = ""
+                                otpRemainTxt = "Vui lòng nhấn Gửi OTP để lấy mã"
                                 isSentOtp = false
                             }
                         )
@@ -288,7 +293,7 @@ public struct PhoneLoginOtpView: View {
 
     private func requestLoginWithOtp() {
         guard !phoneNumber.isEmpty, !otpNumber.isEmpty else {
-            AlertDialog.instance.show(message: "Vui lòng nhập SĐT và otp")
+            AlertDialog.instance.show(message: "Vui lòng nhập SĐT")
             return
         }
         //        let validation = phoneNumberValidator.validate(text: phoneNumber)
@@ -319,17 +324,6 @@ public struct PhoneLoginOtpView: View {
                 switch result {
                 case .success(let data):
                     
-
-                    // Parse the response if necessary
-//                    if let jsonResponse = try? JSONSerialization.jsonObject(
-//                        with: data,
-//                        options: []
-//                    ),
-//                        let responseDict = jsonResponse as? [String: Any]
-//                    {
-//                        print("requestLoginWithOtp Response: \(responseDict)")
-//                        onLoginResponse(jsonData: data)
-//                    }
                     onLoginResponse(jsonData: data)
                 case .failure(let error):
                     // Handle failure response
@@ -354,8 +348,12 @@ public struct PhoneLoginOtpView: View {
             )
 
             var message = "Lỗi đăng nhập"
-
-            if apiResponse.isSuccess() {
+            if apiResponse.isOtpExpire() {
+                otpNumber = ""
+                AlertDialog.instance.show(
+                    message: apiResponse.message
+                )
+            }else if apiResponse.isSuccess() {
 
                 //                print(
                 //                    "onLoginResponse onRequestSuccess mustActive \(apiResponse.isMustActive()) token: \(apiResponse.data?.accessToken ?? "")"
@@ -398,6 +396,7 @@ public struct PhoneLoginOtpView: View {
                 }
 
             } else {
+                otpNumber = ""
                 message = apiResponse.message
                 print(
                     "onLoginResponse fail onRequestSuccess userName: \(message)"

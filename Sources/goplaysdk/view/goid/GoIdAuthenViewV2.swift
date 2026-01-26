@@ -536,8 +536,21 @@ public struct GoIdAuthenViewV2: View {
                                 //                            step = AuthenStep.mobileForceSetPwd
                                 phoneNumber = username
                                 goIdNumber = apiResponse.userInputAccountID
-                                goToResetPhonePwd = true
-                                usernameLock = false  // case nhan back thi co the doi lai sdt neu chua reset pwd
+                                AlertDialog.instance.show(
+                                    message:
+                                        "Bạn cần khôi phục mật khẩu trước khi đăng nhập?",
+//                                    cancelTitle: "Huỷ",
+                                    onOk: {
+                                        goToResetPhonePwd = true
+                                        usernameLock = false  // case nhan back thi co the doi lai sdt neu chua reset pwd
+                                    },
+                                    
+                                    onCancel: {
+                                        usernameLock = false
+                                    }
+                                )
+                                
+                                
                                 return
                             }
 
@@ -552,15 +565,7 @@ public struct GoIdAuthenViewV2: View {
 
                         }
 
-                        //                        if !apiResponse.isCheckAccountMobileActived {
-                        //                            //tk chua xác thực sđt, vui lòng nhập tài khoản kahcs
-                        //                            AlertDialog.instance.show(
-                        //                                message:
-                        //                                    "Tài khoản chưa xác thực sđt, vui lòng nhập tài khoản khác"
-                        //                            )
-                        //                            usernameLock = false
-                        //                            return
-                        //                        }
+                    
 
                         //chuyển màn login với mk
                         step = AuthenStep.loginWithPwd
